@@ -4,11 +4,11 @@
 const int gridSize = 3;
 const int cellSize = 100;
 
-enum class Player { None, Cross, Circle };
+enum class Player { None, CircleRed, CircleBalck };
 
-class TicTacToe {
+class Morpion {
 public:
-    TicTacToe() : currentPlayer(Player::Cross) {
+    Morpion() : currentPlayer(Player::CircleRed) {
         // Initialiser la grille
         for (int i = 0; i < gridSize; ++i) {
             for (int j = 0; j < gridSize; ++j) {
@@ -17,10 +17,7 @@ public:
         }
 
        
-        std::cout << "Entrez le nom du Joueur 1 (X) : ";
-        std::cin >> player1Name;
-        std::cout << "Entrez le nom du Joueur 2 (O) : ";
-        std::cin >> player2Name;
+       
     }
 
     void handleEvent(sf::Event& event) {
@@ -50,10 +47,10 @@ public:
                 window.draw(cell);
 
                 // Dessiner X ou O
-                if (board[i][j] == Player::Cross) {
+                if (board[i][j] == Player::CircleRed) {
                     drawCircleR(window, j * cellSize, i * cellSize);
                 }
-                else if (board[i][j] == Player::Circle) {
+                else if (board[i][j] == Player::CircleBalck) {
                     drawCircle(window, j * cellSize, i * cellSize);
                 }
             }
@@ -105,11 +102,10 @@ public:
 private:
     Player currentPlayer;
     Player board[gridSize][gridSize];
-    std::string player1Name;
-    std::string player2Name;
+    
 
     void switchPlayer() {
-        currentPlayer = (currentPlayer == Player::Cross) ? Player::Circle : Player::Cross;
+        currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
     }
 
     void drawCircleR(sf::RenderWindow& window, float x, float y) {
@@ -132,9 +128,18 @@ private:
 };
 
 int main() {
+
+    std::string player1Name;
+    std::string player2Name;
+
+    std::cout << "Entrez le nom du Joueur 1 (X) : ";
+    std::cin >> player1Name;
+    std::cout << "Entrez le nom du Joueur 2 (O) : ";
+    std::cin >> player2Name;
+
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
-    TicTacToe game;
+    Morpion game;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -149,6 +154,7 @@ int main() {
         game.draw(window);
         if (game.checkGameOver()) {
             std::cout << "La partie est terminée !" << std::endl;
+            window.close();
         }
     }
 
