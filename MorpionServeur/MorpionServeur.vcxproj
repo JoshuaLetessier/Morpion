@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e7d4fe20-9874-4760-ab2a-75767b2898b3}</ProjectGuid>
-    <RootNamespace>MorpionReseau</RootNamespace>
+    <ProjectGuid>{0d296825-c0b8-4d1e-b193-f47770f01a34}</ProjectGuid>
+    <RootNamespace>MorpionServeur</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,7 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="MorpionReseau.cpp" />
+    <ClCompile Include="MorpionServeur.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
