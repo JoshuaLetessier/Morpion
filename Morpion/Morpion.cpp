@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+#include "client.cpp"
+
 const int gridSize = 3;
 const int cellSize = 100;
 
@@ -49,6 +51,7 @@ public:
                 // Dessiner X ou O
                 if (board[i][j] == Player::CircleRed) {
                     drawCircleR(window, j * cellSize, i * cellSize);
+
                 }
                 else if (board[i][j] == Player::CircleBalck) {
                     drawCircle(window, j * cellSize, i * cellSize);
@@ -129,13 +132,22 @@ private:
 
 int main() {
 
+    client();
+    
     std::string player1Name;
     std::string player2Name;
 
     std::cout << "Entrez le nom du Joueur 1 (X) : ";
     std::cin >> player1Name;
+  
+    sendData(player1Name.c_str());
+
     std::cout << "Entrez le nom du Joueur 2 (O) : ";
     std::cin >> player2Name;
+
+    sendData(player2Name.c_str());
+
+
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
@@ -146,6 +158,7 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+                killClient();
             }
 
             game.handleEvent(event);
