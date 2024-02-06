@@ -18,8 +18,8 @@ public:
             }
         }
 
-       
-       
+
+
     }
 
     void handleEvent(sf::Event& event) {
@@ -57,8 +57,6 @@ public:
                     drawCircle(window, j * cellSize, i * cellSize);
                 }
             }
-
-
         }
 
         window.display();
@@ -105,7 +103,7 @@ public:
 private:
     Player currentPlayer;
     Player board[gridSize][gridSize];
-    
+
 
     void switchPlayer() {
         currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
@@ -133,13 +131,13 @@ private:
 int main() {
 
     client();
-    
+
     std::string player1Name;
     std::string player2Name;
 
     std::cout << "Entrez le nom du Joueur 1 (X) : ";
     std::cin >> player1Name;
-  
+
     sendData(player1Name.c_str());
 
     std::cout << "Entrez le nom du Joueur 2 (O) : ";

@@ -14,11 +14,11 @@ static SOCKET ConnectSocket = INVALID_SOCKET;
 inline int client()
 {
     WSADATA wsaData;
-    
+
     struct addrinfo* result = NULL;
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
-    
+
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -76,7 +76,7 @@ inline int client()
 
     //Sleep(5000);
 
-   
+
 
     return 0;
 }
