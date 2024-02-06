@@ -98,6 +98,6 @@ inline int killClient()
 inline int sendData(const char data[4096])
 {
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-
+   
     return 0;
 }

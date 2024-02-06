@@ -51,14 +51,12 @@ public:
                 // Dessiner X ou O
                 if (board[i][j] == Player::CircleRed) {
                     drawCircleR(window, j * cellSize, i * cellSize);
-
+                    
                 }
                 else if (board[i][j] == Player::CircleBalck) {
                     drawCircle(window, j * cellSize, i * cellSize);
                 }
             }
-
-
         }
 
         window.display();
