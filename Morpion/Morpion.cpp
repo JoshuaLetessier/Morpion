@@ -1,28 +1,26 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+#include "Morpion.hpp"
 #include "client.cpp"
 
 const int gridSize = 3;
 const int cellSize = 100;
 
 enum class Player { None, CircleRed, CircleBalck };
+Player currentPlayer;
+Player board[gridSize][gridSize];
 
-class Morpion {
-public:
-    Morpion() : currentPlayer(Player::CircleRed) {
+    Morpion::Morpion() : currentPlayer(Player::CircleRed) {
         // Initialiser la grille
         for (int i = 0; i < gridSize; ++i) {
             for (int j = 0; j < gridSize; ++j) {
                 board[i][j] = Player::None;
             }
         }
-
-       
-       
     }
 
-    void handleEvent(sf::Event& event) {
+    void Morpion::handleEvent(sf::Event& event) {
         if (event.type == sf::Event::MouseButtonPressed) {
             int mouseX = event.mouseButton.x / cellSize;
             int mouseY = event.mouseButton.y / cellSize;
@@ -36,7 +34,8 @@ public:
         }
     }
 
-    void draw(sf::RenderWindow& window) {
+
+    void Morpion::draw(sf::RenderWindow& window) {
         window.clear();
 
         // Dessiner la grille
@@ -62,7 +61,7 @@ public:
         window.display();
     }
 
-    bool checkGameOver() const {
+    bool Morpion::checkGameOver() const {
         // Vérifier les lignes et colonnes
         for (int i = 0; i < gridSize; ++i) {
             if (board[i][0] != Player::None &&
@@ -99,17 +98,11 @@ public:
         return true;  // Toutes les cases sont remplies, la partie est égale
     }
 
-
-private:
-    Player currentPlayer;
-    Player board[gridSize][gridSize];
-    
-
-    void switchPlayer() {
+    void Morpion::switchPlayer() {
         currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
     }
 
-    void drawCircleR(sf::RenderWindow& window, float x, float y) {
+    void Morpion::drawCircleR(sf::RenderWindow& window, float x, float y) {
         sf::CircleShape circle(cellSize / 2 - 10);
         circle.setPosition(x + 10, y + 10);
         circle.setOutlineThickness(2);
@@ -118,7 +111,7 @@ private:
         window.draw(circle);
     }
 
-    void drawCircle(sf::RenderWindow& window, float x, float y) {
+    void Morpion::drawCircle(sf::RenderWindow& window, float x, float y) {
         sf::CircleShape circle(cellSize / 2 - 10);
         circle.setPosition(x + 10, y + 10);
         circle.setOutlineThickness(2);
@@ -126,18 +119,17 @@ private:
         circle.setFillColor(sf::Color::Transparent);
         window.draw(circle);
     }
-};
 
-int main() {
+int Morpion::main() {
 
     client();
-    
+
     std::string player1Name;
     std::string player2Name;
 
     std::cout << "Entrez le nom du Joueur 1 (X) : ";
     std::cin >> player1Name;
-  
+
     sendData(player1Name.c_str());
 
     std::cout << "Entrez le nom du Joueur 2 (O) : ";

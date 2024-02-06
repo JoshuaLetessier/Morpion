@@ -3,7 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include <winsock2.h>()
+#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -116,7 +116,8 @@ inline int __cdecl serve(void)
             break;  // Sortir de la boucle si le client ferme la connexion
         }
         else {
-            printf("recv failed with error: %d\n", WSAGetLastError());//client fermé avant
+
+            printf("recv failed with error: %d\n", WSAGetLastError());//client fermÃ© avant
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
