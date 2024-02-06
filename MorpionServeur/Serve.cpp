@@ -1,4 +1,4 @@
-﻿#undef UNICODE
+#undef UNICODE
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -116,7 +116,8 @@ inline int __cdecl serve(void)
             break;  // Sortir de la boucle si le client ferme la connexion
         }
         else {
-            printf("recv failed with error: %d\n", WSAGetLastError());//client ferm� avant
+
+            printf("recv failed with error: %d\n", WSAGetLastError());//client fermé avant
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
