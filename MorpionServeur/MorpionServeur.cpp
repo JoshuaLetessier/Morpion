@@ -7,6 +7,8 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fstream>
+#include <simdjson.h>
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -14,6 +16,26 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
+
+void parse() 
+{
+    simdjson::ondemand::parser parser;
+    auto save_json = R"( [
+  { "name": "nom", "victoire": "non",  "date": 0 },
+  { "name": "nom", "victoire": "non",   "date": 0 }
+] )"_padded;
+
+    // Iterating through an array of objects
+    for (simdjson::ondemand::object save : parser.iterate(save_json)) {
+        // Accessing a field by name
+        std::cout << "Make/Model: " << std::string_view(save["make"]) << "/" << std::string_view(save["model"]) << std::endl;
+
+        // Casting a JSON element to an integer
+        uint64_t year = save["year"];
+        std::cout << "- This car is " << 2020 - year << "years old." << std::endl;
+    }
+}
+
 
 int __cdecl main(void)
 {
