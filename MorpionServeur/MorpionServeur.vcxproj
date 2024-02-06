@@ -136,6 +136,10 @@
     <ClCompile Include="MorpionServeur.cpp" />
     <ClCompile Include="Serve.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MorpionServer.hpp" />
+    <ClInclude Include="Serve.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
