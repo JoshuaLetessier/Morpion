@@ -7,18 +7,10 @@
 const int gridSize = 3;
 const int cellSize = 100;
 
-enum class Player { None, CircleRed, CircleBalck };
-Player currentPlayer;
-Player board[gridSize][gridSize];
-
-    Morpion::Morpion() : currentPlayer(Player::CircleRed) {
-        // Initialiser la grille
-        for (int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
-                board[i][j] = Player::None;
-            }
-        }
-    }
+Morpion::Morpion() : currentPlayer(Player::CircleRed) {
+    // Initialiser la grille avec des valeurs par défaut
+    board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
+}
 
     void Morpion::handleEvent(sf::Event& event) {
         if (event.type == sf::Event::MouseButtonPressed) {
@@ -120,7 +112,7 @@ Player board[gridSize][gridSize];
         window.draw(circle);
     }
 
-int Morpion::main() {
+int main() {
 
     client();
 
