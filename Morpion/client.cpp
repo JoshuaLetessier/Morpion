@@ -5,23 +5,31 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-#define ADRESS_IP "10.1.144.22"
-
+#define ADRESS_IP "10.1.144.16"
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
 inline int client()
 {
+   
     WSADATA wsaData;
+
     
     struct addrinfo* result = NULL;
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
+
+    ZeroMemory(&hints, sizeof(hints));
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+
     
 
-    // Initialize Winsock
+
+    // Initialize Winsock 
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed with error: %d\n", iResult);
@@ -41,13 +49,15 @@ inline int client()
         return 1;
     }
 
+    ptr = result;
     // Attempt to connect to an address until one succeeds
-    for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+    //for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
         // Create a SOCKET for connecting to server
         ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
         if (ConnectSocket == INVALID_SOCKET) {
             printf("socket failed with error: %ld\n", WSAGetLastError());
+            freeaddrinfo(result);
             WSACleanup();
             return 1;
         }
@@ -58,12 +68,14 @@ inline int client()
             printf("Error for socket server : %ld\n", WSAGetLastError());
             closesocket(ConnectSocket);
             ConnectSocket = INVALID_SOCKET;
-            continue;
+            //continue;
         }
-        break;
-    }
+        //break;
+   // }
 
     freeaddrinfo(result);
+
+    printf("avant test connexion...\n");
 
     if (ConnectSocket == INVALID_SOCKET) {
         printf("Unable to connect to server! %ld\n", WSAGetLastError());
@@ -71,14 +83,33 @@ inline int client()
         return 1;
     }
 
+    
+    const char* data = "connexion";
+    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
+    if (iResult == SOCKET_ERROR) {
+        printf("send failed: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
+    }
 
-
-    //iResult = send(ConnectSocket, messageToSend1, (int)strlen(messageToSend1), 0);
-
-
-    //Sleep(5000);
-
+    
    
+    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
+   
+ 
+        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+        if (iResult > 0) {
+            printf("Message received from server: %.*s\n", iResult, recvbuf);
+        }
+        else if (iResult == 0) {
+            printf("Connection closed by server...\n");
+        }
+        else {
+            printf("recv failed with error: %d\n", WSAGetLastError());
+        }
+
+
 
     return 0;
 }
@@ -92,13 +123,14 @@ inline int killClient()
         WSACleanup();
         return 1;
     }
-    // cleanup
+
     closesocket(ConnectSocket);
     WSACleanup();
 }
 
 inline int sendData(const char data[4096])
 {
+
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
 
     return 0;

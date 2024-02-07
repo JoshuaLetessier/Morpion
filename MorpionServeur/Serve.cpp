@@ -7,13 +7,6 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <fstream>
-//#include <json\json.h>
-//#include "..\simdjson\simdjson.h"
-#include <nlohmann\json.hpp>
-using json = nlohmann::json;
-
-#include "Serve.cpp"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -21,26 +14,9 @@ using json = nlohmann::json;
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-#define ADRESS_IP "10.1.144.16"
-std::string newName = "Leo";
-
-void createJson() 
-{
-    // Using user-defined (raw) string literals
-    using namespace nlohmann::literals;
-    json save_morpion = R"(
-  { "name": "inconnu1", "victoire": false,  "date": 0 },
-  { "name": "inconnu2", "victoire": false,  "date": 0 }
-)"_json;
-}
-
-void editJson(std::string newName, bool newVictory, std::time_t newDate)
-{
-
-}
 
 
-int __cdecl main(void)
+inline int  serve(void)
 {
     WSADATA wsaData;
     int iResult;
@@ -75,7 +51,7 @@ int __cdecl main(void)
         WSACleanup();
         return 1;
     }
-    
+
     // Create a SOCKET for the server to listen for client connections.
     ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (ListenSocket == INVALID_SOCKET) {
@@ -88,7 +64,7 @@ int __cdecl main(void)
     // Setup the TCP listening socket
     iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %ld\n", WSAGetLastError());
+        printf("bind failed with error: %d\n", WSAGetLastError());
         freeaddrinfo(result);
         closesocket(ListenSocket);
         WSACleanup();
@@ -105,19 +81,26 @@ int __cdecl main(void)
         return 1;
     }
 
-    printf("serveur en attente...\n");
-
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
     if (ClientSocket == INVALID_SOCKET) {
-        printf("accept failed with error: %ld\n", WSAGetLastError());
+        printf("accept failed with error: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
         WSACleanup();
         return 1;
     }
-    
-    printf("Client present !\n");
-   
+
+    const char* message = "Hello from server!";
+    iSendResult = send(ClientSocket, message, (int)strlen(message), 0);
+    if (iSendResult == SOCKET_ERROR) {
+        printf("send failed with error: %d\n", WSAGetLastError());
+        closesocket(ClientSocket);
+        WSACleanup();
+        return 1;
+    }
+    printf("Bytes sent: %d\n", iSendResult);
+
+
     // Receive until the peer shuts down the connection
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
@@ -128,7 +111,7 @@ int __cdecl main(void)
             // Echo the buffer back to the sender
             iSendResult = send(ClientSocket, recvbuf, iResult, 0);
             if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %ld\n", WSAGetLastError());
+                printf("send failed with error: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
                 WSACleanup();
                 return 1;
@@ -141,7 +124,10 @@ int __cdecl main(void)
             break;  // Sortir de la boucle si le client ferme la connexion
         }
         else {
-            printf("recv failed with error: %ld\n", WSAGetLastError());//client fermé avant
+
+
+            printf("recv failed with error: %d\n", WSAGetLastError());//client ferm� avant
+
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
