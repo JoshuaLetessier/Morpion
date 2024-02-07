@@ -24,6 +24,10 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
                 board[mouseY][mouseX] == Player::None) {
                 board[mouseY][mouseX] = currentPlayer;
                 switchPlayer();
+
+                std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
+                const char* data = dataConvert.c_str();
+                sendData(data);
             }
         }
     }
@@ -115,6 +119,7 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
 
 int main() {
 
+   
     client();
 
     std::string player1Name;
@@ -129,8 +134,6 @@ int main() {
     std::cin >> player2Name;
 
     sendData(player2Name.c_str());
-
-
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 

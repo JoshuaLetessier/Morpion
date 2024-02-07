@@ -15,6 +15,7 @@
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
+
 inline int  serve(void)
 {
     WSADATA wsaData;
@@ -89,10 +90,6 @@ inline int  serve(void)
         return 1;
     }
 
-
-    // No longer need server socket
-    closesocket(ListenSocket);
-
     const char* message = "Hello from server!";
     iSendResult = send(ClientSocket, message, (int)strlen(message), 0);
     if (iSendResult == SOCKET_ERROR) {
@@ -102,7 +99,6 @@ inline int  serve(void)
         return 1;
     }
     printf("Bytes sent: %d\n", iSendResult);
-
 
 
     // Receive until the peer shuts down the connection
