@@ -80,6 +80,7 @@ inline int  serve(void)
         WSACleanup();
         return 1;
     }
+    printf("serveur en attente \n");
 
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
@@ -89,7 +90,7 @@ inline int  serve(void)
         WSACleanup();
         return 1;
     }
-
+    printf("client present \n");
     const char* message = "Hello from server!";
     iSendResult = send(ClientSocket, message, (int)strlen(message), 0);
     if (iSendResult == SOCKET_ERROR) {
