@@ -1,40 +1,20 @@
-#undef UNICODE
+#include"Serve.hpp"
 
-#define WIN32_LEAN_AND_MEAN
 
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
 
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-// #pragma comment (lib, "Mswsock.lib")
-
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
-
-inline int __cdecl serve(void)
+Serve::Serve()
 {
     WSADATA wsaData;
-    int iResult;
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-    SOCKET ClientSocket = INVALID_SOCKET;
 
     struct addrinfo* result = NULL;
     struct addrinfo hints;
 
-    int iSendResult;
-    char recvbuf[DEFAULT_BUFLEN];
-    int recvbuflen = DEFAULT_BUFLEN;
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed with error: %d\n", iResult);
-        return 1;
+        return;
     }
 
     ZeroMemory(&hints, sizeof(hints));
@@ -48,7 +28,7 @@ inline int __cdecl serve(void)
     if (iResult != 0) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
-        return 1;
+        return;
     }
 
     // Create a SOCKET for the server to listen for client connections.
@@ -57,7 +37,7 @@ inline int __cdecl serve(void)
         printf("socket failed with error: %ld\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
-        return 1;
+        return;
     }
 
     // Setup the TCP listening socket
@@ -67,7 +47,7 @@ inline int __cdecl serve(void)
         freeaddrinfo(result);
         closesocket(ListenSocket);
         WSACleanup();
-        return 1;
+        return;
     }
 
     freeaddrinfo(result);
@@ -77,7 +57,7 @@ inline int __cdecl serve(void)
         printf("listen failed with error: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
         WSACleanup();
-        return 1;
+        return;
     }
 
     // Accept a client socket
@@ -86,13 +66,19 @@ inline int __cdecl serve(void)
         printf("accept failed with error: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
         WSACleanup();
-        return 1;
+        return;
     }
 
 
     // No longer need server socket
     closesocket(ListenSocket);
+}
 
+
+
+
+
+inline int Serve::listen(){
     // Receive until the peer shuts down the connection
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
@@ -124,7 +110,12 @@ inline int __cdecl serve(void)
         }
 
     } while (iResult > 0);
+}
+  
 
+
+
+inline int Serve::killServ(){
     // shutdown the connection since we're done
     iResult = shutdown(ClientSocket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
@@ -139,4 +130,4 @@ inline int __cdecl serve(void)
     WSACleanup();
 
     return 0;
-}
+    }
