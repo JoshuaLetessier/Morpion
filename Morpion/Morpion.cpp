@@ -16,10 +16,7 @@ public:
             for (int j = 0; j < gridSize; ++j) {
                 board[i][j] = Player::None;
             }
-        }
-
-       
-       
+        } 
     }
 
     void handleEvent(sf::Event& event) {
@@ -50,8 +47,7 @@ public:
 
                 // Dessiner X ou O
                 if (board[i][j] == Player::CircleRed) {
-                    drawCircleR(window, j * cellSize, i * cellSize);
-                    
+                    drawCircleR(window, j * cellSize, i * cellSize); 
                 }
                 else if (board[i][j] == Player::CircleBalck) {
                     drawCircle(window, j * cellSize, i * cellSize);

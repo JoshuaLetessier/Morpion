@@ -3,7 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include <winsock2.h>()
+#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-inline int __cdecl serve(void)
+inline int  serve(void)
 {
     WSADATA wsaData;
     int iResult;
@@ -93,6 +93,18 @@ inline int __cdecl serve(void)
     // No longer need server socket
     closesocket(ListenSocket);
 
+    const char* message = "Hello from server!";
+    iSendResult = send(ClientSocket, message, (int)strlen(message), 0);
+    if (iSendResult == SOCKET_ERROR) {
+        printf("send failed with error: %d\n", WSAGetLastError());
+        closesocket(ClientSocket);
+        WSACleanup();
+        return 1;
+    }
+    printf("Bytes sent: %d\n", iSendResult);
+
+
+
     // Receive until the peer shuts down the connection
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
@@ -116,6 +128,7 @@ inline int __cdecl serve(void)
             break;  // Sortir de la boucle si le client ferme la connexion
         }
         else {
+
             printf("recv failed with error: %d\n", WSAGetLastError());//client fermé avant
             closesocket(ClientSocket);
             WSACleanup();

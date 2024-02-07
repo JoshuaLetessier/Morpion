@@ -5,6 +5,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
 static int iResult = 0;
@@ -13,12 +14,16 @@ static SOCKET ConnectSocket = INVALID_SOCKET;
 
 inline int client()
 {
+   
     WSADATA wsaData;
-    
+
     struct addrinfo* result = NULL;
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
-    
+
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -69,14 +74,20 @@ inline int client()
         return 1;
     }
 
-
-
-    //iResult = send(ConnectSocket, messageToSend1, (int)strlen(messageToSend1), 0);
-
-
-    //Sleep(5000);
-
    
+ 
+        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+        if (iResult > 0) {
+            printf("Message received from server: %.*s\n", iResult, recvbuf);
+        }
+        else if (iResult == 0) {
+            printf("Connection closed by server...\n");
+        }
+        else {
+            printf("recv failed with error: %d\n", WSAGetLastError());
+        }
+
+
 
     return 0;
 }
@@ -98,6 +109,6 @@ inline int killClient()
 inline int sendData(const char data[4096])
 {
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-   
+
     return 0;
 }
