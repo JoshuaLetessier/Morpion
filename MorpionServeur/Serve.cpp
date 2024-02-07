@@ -129,7 +129,9 @@ inline int  serve(void)
         }
         else {
 
-            printf("recv failed with error: %d\n", WSAGetLastError());//client fermé avant
+
+            printf("recv failed with error: %d\n", WSAGetLastError());//client fermï¿½ avant
+
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
