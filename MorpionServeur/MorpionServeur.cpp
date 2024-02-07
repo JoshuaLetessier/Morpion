@@ -8,8 +8,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fstream>
-#include <json\json.h>
-#include "..\simdjson\simdjson.h"
+//#include <json\json.h>
+//#include "..\simdjson\simdjson.h"
+#include <nlohmann\json.hpp>
+using json = nlohmann::json;
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -17,21 +19,7 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-
-void parse() 
-{
-    simdjson::ondemand::parser parser;
-    auto save_json = R"( [
-  { "name": "inconnu1", "victoire": "non",  "date": 0 },
-  { "name": "inconnu2", "victoire": "non",   "date": 0 }
-] )"_padded;
-
-    // Iterating through an array of objects
-    for (simdjson::ondemand::object save : parser.iterate(save_json)) {
-        // Accessing a field by name
-        std::cout << "Nom : " << std::string_view(save["name"]) << std::endl;
-    }
-}
+std::string newName = "Leo";
 
 
 int __cdecl main(void)
