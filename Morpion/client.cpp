@@ -5,7 +5,6 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 #define ADRESS_IP "10.1.144.16"
@@ -66,6 +65,7 @@ inline int client()
         // Connect to server
         iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
         if (iResult == SOCKET_ERROR) {
+            printf("Error for socket server : %ld\n", WSAGetLastError());
             closesocket(ConnectSocket);
             ConnectSocket = INVALID_SOCKET;
             //continue;
@@ -78,7 +78,7 @@ inline int client()
     printf("avant test connexion...\n");
 
     if (ConnectSocket == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
+        printf("Unable to connect to server! %ld\n", WSAGetLastError());
         WSACleanup();
         return 1;
     }
