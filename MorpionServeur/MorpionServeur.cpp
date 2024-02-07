@@ -7,6 +7,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #include <fstream>
 //#include <json\json.h>
 //#include "..\simdjson\simdjson.h"
@@ -22,25 +23,32 @@ using json = nlohmann::json;
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 #define ADRESS_IP "10.1.144.16"
-std::string newName = "Leo";
 
-void createJson() 
+json save_morpion;
+const char* newName = "Leo";
+
+void initJson() 
 {
     // Using user-defined (raw) string literals
     using namespace nlohmann::literals;
-    json save_morpion = R"(
-  { "name": "inconnu1", "victoire": false,  "date": 0 },
-  { "name": "inconnu2", "victoire": false,  "date": 0 }
+    save_morpion = R"(
+  { "name1": "inconnu", "victoire": false,  "date": 0 },
+  { "name2": "inconnu", "victoire": false,  "date": 0 }
 )"_json;
 }
 
-void editJson(std::string newName, bool newVictory, std::time_t newDate)
+void editJson(const char* newName, bool newVictory, std::time_t newDate)
 {
-
+    //save_morpion["name1"_json_pointer] = newName;
+    std::cout << save_morpion.dump(3) << std::endl;
 }
+
+
 
 
 int __cdecl main(void)
 {
-    serve();
+    initJson();
+    //editJson(newName, false, 0);
+    //serve();
 }
