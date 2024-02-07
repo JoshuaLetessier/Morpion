@@ -7,10 +7,12 @@
 const int gridSize = 3;
 const int cellSize = 100;
 
+
 Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     // Initialiser la grille avec des valeurs par défaut
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
+
 
     void Morpion::handleEvent(sf::Event& event) {
         if (event.type == sf::Event::MouseButtonPressed) {
@@ -41,8 +43,7 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
 
                 // Dessiner X ou O
                 if (board[i][j] == Player::CircleRed) {
-                    drawCircleR(window, j * cellSize, i * cellSize);
-                    
+                    drawCircleR(window, j * cellSize, i * cellSize); 
                 }
                 else if (board[i][j] == Player::CircleBalck) {
                     drawCircle(window, j * cellSize, i * cellSize);
