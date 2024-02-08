@@ -102,6 +102,18 @@ inline int  serve(void)
     printf("Bytes sent: %d\n", iSendResult);
 
 
+<<<<<<< Updated upstream
+=======
+    // No longer need server socket
+    closesocket(ListenSocket);
+}
+
+
+
+
+
+inline int Serve::listening(){
+>>>>>>> Stashed changes
     // Receive until the peer shuts down the connection
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
