@@ -14,6 +14,8 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
+static int iResult = 0;
+static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
 inline int  serve(void)
@@ -148,6 +150,14 @@ inline int  serve(void)
     // cleanup
     closesocket(ClientSocket);
     WSACleanup();
+
+    return 0;
+}
+
+inline int sendData(const char data[4096])
+{
+
+    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
 
     return 0;
 }

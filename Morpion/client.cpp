@@ -2,21 +2,23 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
+#include <nlohmann\json.hpp>
+using json = nlohmann::json;
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-#define ADRESS_IP "10.1.144.16"
+#define ADRESS_IP "127.0.0.1"
+//#define ADRESS_IP "10.1.144.16"
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
-inline int client()
+inline int client(char* callback)
 {
    
     WSADATA wsaData;
-
     
     struct addrinfo* result = NULL;
     struct addrinfo* ptr = NULL;
@@ -25,9 +27,6 @@ inline int client()
     ZeroMemory(&hints, sizeof(hints));
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-
-    
-
 
     // Initialize Winsock 
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -51,27 +50,23 @@ inline int client()
 
     ptr = result;
     // Attempt to connect to an address until one succeeds
-    //for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
-        // Create a SOCKET for connecting to server
-        ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-        if (ConnectSocket == INVALID_SOCKET) {
-            printf("socket failed with error: %ld\n", WSAGetLastError());
-            freeaddrinfo(result);
-            WSACleanup();
-            return 1;
-        }
+    // Create a SOCKET for connecting to server
+    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+    if (ConnectSocket == INVALID_SOCKET) {
+        printf("socket failed with error: %ld\n", WSAGetLastError());
+        freeaddrinfo(result);
+        WSACleanup();
+        return 1;
+    }
 
-        // Connect to server
-        iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-        if (iResult == SOCKET_ERROR) {
-            printf("Error for socket server : %ld\n", WSAGetLastError());
-            closesocket(ConnectSocket);
-            ConnectSocket = INVALID_SOCKET;
-            //continue;
-        }
-        //break;
-   // }
+    // Connect to server
+    iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        printf("Error for socket server : %ld\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        ConnectSocket = INVALID_SOCKET;
+    }
 
     freeaddrinfo(result);
 
@@ -82,7 +77,6 @@ inline int client()
         WSACleanup();
         return 1;
     }
-
     
     const char* data = "connexion";
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
@@ -92,15 +86,13 @@ inline int client()
         WSACleanup();
         return 1;
     }
-
-    
    
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-   
  
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) {
             printf("Message received from server: %.*s\n", iResult, recvbuf);
+            callback = recvbuf;
         }
         else if (iResult == 0) {
             printf("Connection closed by server...\n");
@@ -109,11 +101,8 @@ inline int client()
             printf("recv failed with error: %d\n", WSAGetLastError());
         }
 
-
-
     return 0;
 }
-
 
 inline int killClient()
 {

@@ -31,6 +31,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="..\packages.config">
+      <Filter>Fichiers sources</Filter>
+    </None>
   </ItemGroup>
 </Project>

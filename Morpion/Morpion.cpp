@@ -14,126 +14,73 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
 }
 
 
-    void Morpion::handleEvent(sf::Event& event) {
-        if (event.type == sf::Event::MouseButtonPressed) {
-            int mouseX = event.mouseButton.x / cellSize;
-            int mouseY = event.mouseButton.y / cellSize;
+void Morpion::handleEvent(sf::Event& event) {
+    if (event.type == sf::Event::MouseButtonPressed) {
+        int mouseX = event.mouseButton.x / cellSize;
+        int mouseY = event.mouseButton.y / cellSize;
 
-            // case est valide et non occupée
-            if (mouseX >= 0 && mouseX < gridSize && mouseY >= 0 && mouseY < gridSize &&
-                board[mouseY][mouseX] == Player::None) {
-                board[mouseY][mouseX] = currentPlayer;
-                switchPlayer();
+        std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
+        const char* data = dataConvert.c_str();
+        sendData(data);
+    }
+}
 
-                std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
-                const char* data = dataConvert.c_str();
-                sendData(data);
+
+void Morpion::draw(sf::RenderWindow& window) {
+    window.clear();
+
+    // Dessiner la grille
+    for (int i = 0; i < gridSize; ++i) {
+        for (int j = 0; j < gridSize; ++j) {
+            sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
+            cell.setPosition(j * cellSize, i * cellSize);
+            cell.setOutlineThickness(2);
+            cell.setOutlineColor(sf::Color::Black);
+            window.draw(cell);
+
+            // Dessiner X ou O
+            if (board[i][j] == Player::CircleRed) {
+                drawCircleR(window, j * cellSize, i * cellSize); 
+            }
+            else if (board[i][j] == Player::CircleBalck) {
+                drawCircle(window, j * cellSize, i * cellSize);
             }
         }
     }
 
+    window.display();
+}
 
-    void Morpion::draw(sf::RenderWindow& window) {
-        window.clear();
+void Morpion::drawCircleR(sf::RenderWindow& window, float x, float y) {
+    sf::CircleShape circle(cellSize / 2 - 10);
+    circle.setPosition(x + 10, y + 10);
+    circle.setOutlineThickness(2);
+    circle.setOutlineColor(sf::Color::Red);
+    circle.setFillColor(sf::Color::Transparent);
+    window.draw(circle);
+}
 
-        // Dessiner la grille
-        for (int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
-                sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
-                cell.setPosition(j * cellSize, i * cellSize);
-                cell.setOutlineThickness(2);
-                cell.setOutlineColor(sf::Color::Black);
-                window.draw(cell);
-
-                // Dessiner X ou O
-                if (board[i][j] == Player::CircleRed) {
-                    drawCircleR(window, j * cellSize, i * cellSize); 
-                }
-                else if (board[i][j] == Player::CircleBalck) {
-                    drawCircle(window, j * cellSize, i * cellSize);
-                }
-            }
-        }
-
-        window.display();
-    }
-
-    bool Morpion::checkGameOver() const {
-        // Vérifier les lignes et colonnes
-        for (int i = 0; i < gridSize; ++i) {
-            if (board[i][0] != Player::None &&
-                board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
-                return true;  // Victoire sur la ligne i
-            }
-
-            if (board[0][i] != Player::None &&
-                board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
-                return true;  // Victoire sur la colonne i
-            }
-        }
-
-        // Vérifier les diagonales
-        if (board[0][0] != Player::None &&
-            board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
-            return true;  // Victoire sur la diagonale principale
-        }
-
-        if (board[0][2] != Player::None &&
-            board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
-            return true;  // Victoire sur l'autre diagonale
-        }
-
-        // Vérifier l'égalité
-        for (int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
-                if (board[i][j] == Player::None) {
-                    return false;  // Il reste des cases vides, le jeu n'est pas égal
-                }
-            }
-        }
-
-        return true;  // Toutes les cases sont remplies, la partie est égale
-    }
-
-    void Morpion::switchPlayer() {
-        currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
-    }
-
-    void Morpion::drawCircleR(sf::RenderWindow& window, float x, float y) {
-        sf::CircleShape circle(cellSize / 2 - 10);
-        circle.setPosition(x + 10, y + 10);
-        circle.setOutlineThickness(2);
-        circle.setOutlineColor(sf::Color::Red);
-        circle.setFillColor(sf::Color::Transparent);
-        window.draw(circle);
-    }
-
-    void Morpion::drawCircle(sf::RenderWindow& window, float x, float y) {
-        sf::CircleShape circle(cellSize / 2 - 10);
-        circle.setPosition(x + 10, y + 10);
-        circle.setOutlineThickness(2);
-        circle.setOutlineColor(sf::Color::Black);
-        circle.setFillColor(sf::Color::Transparent);
-        window.draw(circle);
-    }
+void Morpion::drawCircle(sf::RenderWindow& window, float x, float y) {
+    sf::CircleShape circle(cellSize / 2 - 10);
+    circle.setPosition(x + 10, y + 10);
+    circle.setOutlineThickness(2);
+    circle.setOutlineColor(sf::Color::Black);
+    circle.setFillColor(sf::Color::Transparent);
+    window.draw(circle);
+}
 
 int main() {
 
-   
-    client();
+    char cServerCallback[512];
 
-    std::string player1Name;
-    std::string player2Name;
+    client(cServerCallback);
 
-    std::cout << "Entrez le nom du Joueur 1 (X) : ";
-    std::cin >> player1Name;
+    std::string playerName;
 
-    sendData(player1Name.c_str());
+    std::cout << "Entrez votre nom de joueur: ";
+    std::cin >> playerName;
 
-    std::cout << "Entrez le nom du Joueur 2 (O) : ";
-    std::cin >> player2Name;
-
-    sendData(player2Name.c_str());
+    sendData(playerName.c_str());
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
@@ -151,7 +98,7 @@ int main() {
         }
 
         game.draw(window);
-        if (game.checkGameOver()) {
+        if (cServerCallback == "") {
             std::cout << "La partie est terminée !" << std::endl;
             window.close();
         }
