@@ -109,7 +109,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\jsoncppdist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML-2.6.1\lib</AdditionalLibraryDirectories>
@@ -136,14 +136,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MorpionServeur.cpp" />
-    <ClCompile Include="Serve.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="MorpionServer.hpp" />
-    <ClInclude Include="Serve.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
