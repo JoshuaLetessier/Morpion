@@ -2,12 +2,15 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
+#include <nlohmann\json.hpp>
+using json = nlohmann::json;
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 #define ADRESS_IP "10.1.144.16"
+#define LOCAL_ADRESS "127.0.0.1"
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
