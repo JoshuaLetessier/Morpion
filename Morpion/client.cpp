@@ -9,7 +9,7 @@
 #pragma prefast(suppress : 28251, "Cette instance contient aucune annotation.")
 
 #define DEFAULT_PORT "27015"
-
+#define ADRESS_IP "192.168.1.25"
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 inline int client();
@@ -43,10 +43,14 @@ inline int client()
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
 
+    ZeroMemory(&hints, sizeof(hints));
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
 
-    // Initialize Winsock
+    // Initialize Winsock 
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
+
         printf("WSAStartup failed with error: %d\n", iResult);
         return 1;
     }
