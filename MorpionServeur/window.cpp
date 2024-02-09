@@ -10,7 +10,6 @@
 
 #include "MorpionServer.hpp"
 
-
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "User32.lib")
@@ -20,6 +19,8 @@
 #define DATA_BUFSIZE 8192
 
 #define WM_SOCKET (WM_USER + 1)
+
+
 
 // typedef definition
 
@@ -56,6 +57,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 // Global var
 
 LPSOCKET_INFORMATION SocketInfoList;
+WSAEVENT events[2]; //tab event par socket
+DWORD numEvents = 0;  //nb event dans tab
 
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 	MSG msg;
@@ -106,7 +109,6 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 
 	InternetAddr.sin_port = htons(PORT);
 
-
 	if (bind(Listen, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
 	{
 		printf("bind() failed with error %d\n", WSAGetLastError());
@@ -114,7 +116,6 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	}
 	else
 		printf("bind() is OK maaa!\n");
-
 
 	if (listen(Listen, 5))
 	{
@@ -126,27 +127,27 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 
 	// Translate and dispatch window messages for the application thread
 
-	while (Ret = GetMessage(&msg, NULL, 0, 0))
-	{
-		if (Ret == -1)
-		{
-			//printf("\nGetMessage() failed with error %d\n", GetLastError());
-			return 1;
-		}
-		else
-		{
-			//printf("\nGetMessage() is pretty fine!\n");
-		}
+	//while (Ret = GetMessage(&msg, NULL, 0, 0))
+	//{
+	//	if (Ret == -1)
+	//	{
+	//		//printf("\nGetMessage() failed with error %d\n", GetLastError());
+	//		return 1;
+	//	}
+	//	else
+	//	{
+	//		//printf("\nGetMessage() is pretty fine!\n");
+	//	}
 
-		//printf("Translating a message...\n");
+	//	//printf("Translating a message...\n");
 
-		TranslateMessage(&msg);
+	//	TranslateMessage(&msg);
 
-		//printf("Dispatching a message...\n");
+	//	//printf("Dispatching a message...\n");
 
-		DispatchMessage(&msg);
-	}
-	
+	//	DispatchMessage(&msg);
+	//}
+	AsyncServerMain();
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -194,7 +195,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// Create a socket information structure to associate with the socket for processing I/O
 
 				CreateSocketInformation(Accept);
-
+				AddSocketEvent(Accept);
 				printf("Socket number  connected\n");
 
 				WSAAsyncSelect(Accept, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
@@ -412,4 +413,36 @@ HWND MakeWorkerWindow(void)
 	ShowWindow(Window, SW_SHOW);
 	return Window;
 
+}
+
+
+
+//assynchrone base
+void AddSocketEvent(SOCKET socket)
+{
+	events[numEvents++] = WSACreateEvent();
+	WSAEventSelect(socket, events[numEvents - 1], FD_READ | FD_WRITE | FD_CLOSE);
+}
+
+void AsyncServerMain() {
+	while (true) {
+		// Attendre de manière asynchrone l'un des événements
+		DWORD eventIndex = WSAWaitForMultipleEvents(numEvents, events, FALSE, WSA_INFINITE, FALSE);
+
+		// Réagir à l'événement correspondant
+		if (eventIndex != WSA_WAIT_FAILED) {
+			// Récupérer l'indice réel de l'événement
+			eventIndex -= WSA_WAIT_EVENT_0;
+
+			// Traiter l'événement associé au socket correspondant à l'indice eventIndex
+			ProcessSocketEvent(eventIndex);
+
+			// Réinitialiser l'événement pour pouvoir l'utiliser à nouveau
+			WSAResetEvent(events[eventIndex]);
+		}
+	}
+}
+
+void ProcessSocketEvent(DWORD socketIndex) {
+	// ... (Traitement de la lecture, de l'écriture, de la fermeture, etc.)
 }

@@ -2,7 +2,6 @@
 class Morpion {
 public:
 
-
 	Morpion();
 
 	enum class Player { None, CircleRed, CircleBalck };

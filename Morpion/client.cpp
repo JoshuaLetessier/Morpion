@@ -7,10 +7,9 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-#define ADRESS_IP "14.0.0.1"
+#define ADRESS_IP "127.0.0.1"
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
-
 
 inline int client(char* callback)
 {

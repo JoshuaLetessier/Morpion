@@ -2,7 +2,6 @@
 #include <vector>
 class MorpionServer {
 
-
 public:
 
 	MorpionServer();
