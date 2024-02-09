@@ -99,7 +99,7 @@ std::string getPlayerName() {
     //if (!font.loadFromFile("Billie-Eilish.ttf")) {
     //    return "erreur font";  // Ou une autre valeur d'erreur si nécessaire
     //}
-
+//}
 
     sf::Text text;
     text.setFont(font);
@@ -146,6 +146,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     char cServerCallback[512];
     client(cServerCallback);
 
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
     // Définir les paramètres de la fenêtre
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
@@ -170,21 +171,21 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-
     //std::string player1Name;
     //std::string player2Name;
+    //std::string player2Name;
 
-    //std::cout << "Entrez le nom du Joueur 1 (X) : ";
-    //std::cin >> player1Name;
+    std::cout << "Entrez le nom du Joueur 1 (X) : ";
+    std::cin >> player1Name;
 
-    //sendData(player1Name.c_str());
+    sendData(player1Name.c_str());
 
-    //std::cout << "Entrez le nom du Joueur 2 (O) : ";
-    //std::cin >> player2Name;
+    std::cout << "Entrez le nom du Joueur 2 (O) : ";
+    std::cin >> player2Name;
 
-    //sendData(player2Name.c_str());
+    sendData(player2Name.c_str());*/
 
- /*   std::string player1Name = getPlayerName();
+   /* std::string player1Name = getPlayerName();
     if (player1Name.empty()) {
         MessageBox(NULL, L"Nom de joueur non valide. Fermeture de l'application.", L"Erreur", MB_OK | MB_ICONERROR);
         return 1;
@@ -192,10 +193,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
     sendData(player1Name.c_str());*/
 
-
-    
-
-
+   
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     Morpion game;

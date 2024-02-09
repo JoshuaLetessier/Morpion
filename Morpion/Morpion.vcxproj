@@ -137,6 +137,11 @@
   <ItemGroup>
     <ClInclude Include="Morpion.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="arial.TTF">
+      <DeploymentContent>true</DeploymentContent>
+    </Font>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

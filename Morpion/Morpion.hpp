@@ -13,4 +13,5 @@ public:
 	void draw(sf::RenderWindow& window);
 	void drawCircleR(sf::RenderWindow& window, float x, float y);
 	void drawCircle(sf::RenderWindow& window, float x, float y);
+	std::string getPlayerName(sf::Event event, sf::RenderWindow& window);
 };

@@ -17,7 +17,6 @@ inline int client(char* callback)
 
     WSADATA wsaData;
 
-
     struct addrinfo* result = NULL;
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
@@ -25,9 +24,6 @@ inline int client(char* callback)
     ZeroMemory(&hints, sizeof(hints));
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-
-
-
 
     // Initialize Winsock 
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
