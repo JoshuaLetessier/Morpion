@@ -5,14 +5,17 @@ public:
 	Json();
 	~Json();
 
+	// Interaction save_systeme
 	void importListenSocketJson(SOCKET newSocket);
 	void importPlayerSocketJson(SOCKET newPlayerSocket);
+	void importTurnJson(bool newTurn);
 	void importDateJson(std::time_t newDate);
+
+	// Interaction save_morpion
 	void importName1Json(std::string newName);
 	void importName2Json(std::string newName);
-	void importTurnJson(bool newTurn);
-	void importMoveJson(std::string player, std::string newMove);
-	void importVictoryJson(bool player1Victory, bool player2Victory);
+	void importMoveJson(std::string newMove);
+	void importVictoryJson(bool player1Victory);
 
 
 private:

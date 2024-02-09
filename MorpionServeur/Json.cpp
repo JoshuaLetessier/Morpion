@@ -18,7 +18,11 @@ Json::~Json()
 	file << save_systeme << save_morpion;
 }
 
-void Json::importListenSocketJson(SOCKET newSocket)
+/////////////////////////////////////////////////////////////
+/*                 Interaction save_systeme                */
+/////////////////////////////////////////////////////////////
+
+void Json::importListenSocketJson(SOCKET newSocket) // Enregistre le socket d'écoute du serveur
 {
 	if (!save_systeme["socket_info"]["listen_socket"])
 	{
@@ -26,7 +30,7 @@ void Json::importListenSocketJson(SOCKET newSocket)
 	}
 }
 
-void Json::importPlayerSocketJson(SOCKET newPlayerSocket)
+void Json::importPlayerSocketJson(SOCKET newPlayerSocket) // Enregistre les sockets des joueurs lorsqu'elles sont différentes
 {
 	if (!save_systeme["socket_info"]["player1_socket"])
 	{
@@ -38,31 +42,7 @@ void Json::importPlayerSocketJson(SOCKET newPlayerSocket)
 	}
 }
 
-void Json::importDateJson(std::time_t newDate)
-{
-	if (!save_systeme["socket_info"]["date"])
-	{
-		save_systeme["socket_info"]["date"] = newDate;
-	}
-}
-
-void Json::importName1Json(std::string newName)
-{
-	if (!save_morpion["player1"]["name"])
-	{
-		save_morpion["player1"]["name"] = newName;
-	}
-}
-
-void Json::importName2Json(std::string newName)
-{
-	if (!save_morpion["player2"]["name"])
-	{
-		save_morpion["player2"]["name"] = newName;
-	}
-}
-
-void Json::importTurnJson(bool newTurn)
+void Json::importTurnJson(bool newTurn) // Enregistre le tour du joueur en cours
 {
 	if (!save_systeme["player_info"]["turn"])
 	{
@@ -75,11 +55,39 @@ void Json::importTurnJson(bool newTurn)
 	}
 }
 
-void Json::importMoveJson(std::string player, std::string newMove)
+void Json::importDateJson(std::time_t newDate) // Enregistre la date de la partie
+{
+	if (!save_systeme["socket_info"]["date"])
+	{
+		save_systeme["socket_info"]["date"] = newDate;
+	}
+}
+
+/////////////////////////////////////////////////////////////
+/*                 Interaction save_morpion                */
+/////////////////////////////////////////////////////////////
+
+void Json::importName1Json(std::string newName) // Enregistre le nom du joueur 1
+{
+	if (!save_morpion["player1"]["name"])
+	{
+		save_morpion["player1"]["name"] = newName;
+	}
+}
+
+void Json::importName2Json(std::string newName) // Enregistre le nom du joueur 2
+{
+	if (!save_morpion["player2"]["name"])
+	{
+		save_morpion["player2"]["name"] = newName;
+	}
+}
+
+void Json::importMoveJson(std::string newMove) // Enregistre le dernier mouvement
 {
 	if (!save_morpion["player1"]["victory"] && !save_morpion["player2"]["victory"])
 	{
-		if (save_morpion["player1"]["name"] == player )
+		if (save_morpion["player1"]["turn"] == true )
 		{
 			if (!save_morpion["player1"]["move"])
 			{
@@ -91,7 +99,7 @@ void Json::importMoveJson(std::string player, std::string newMove)
 				save_morpion["player1"]["move"] = newMove;
 			}
 		}
-		if (save_morpion["player2"]["name"] == player)
+		else
 		{
 			if (!save_morpion["player2"]["move"])
 			{
@@ -106,7 +114,7 @@ void Json::importMoveJson(std::string player, std::string newMove)
 	}
 }
 
-void Json::importVictoryJson(bool player1Victory, bool player2Victory)
+void Json::importVictoryJson(bool player1Victory) // Enregistre la victoire
 {
 	if (!save_morpion["player1"]["victory"])
 	{
@@ -114,6 +122,6 @@ void Json::importVictoryJson(bool player1Victory, bool player2Victory)
 	}
 	if (!save_morpion["player2"]["victory"])
 	{
-		save_morpion["player2"]["victory"] = player2Victory;
+		save_morpion["player2"]["victory"] = !player1Victory;
 	}
 }
