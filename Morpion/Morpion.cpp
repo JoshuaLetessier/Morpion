@@ -4,8 +4,6 @@
 #include "Morpion.hpp"
 #include "client.cpp"
 
-
-
 const int gridSize = 3;
 const int cellSize = 100;
 
@@ -37,17 +35,22 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
 
-void Morpion::handleEvent(sf::Event& event) {
+void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
 
+        if (mouseX >= 0 && mouseX < gridSize && mouseY >= 0 && mouseY < gridSize &&
+            board[mouseY][mouseX] == Player::None) {
+            board[mouseY][mouseX] = currentPlayer;
+        }
+
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
+        OutputDebugStringA("event detecte \n");
         sendData(data);
     }
 }
-
 
 void Morpion::draw(sf::RenderWindow& window) {
     window.clear();
@@ -64,14 +67,12 @@ void Morpion::draw(sf::RenderWindow& window) {
             // Dessiner X ou O
             if (board[i][j] == Player::CircleRed) {
                 drawCircleR(window, j * cellSize, i * cellSize);
-
             }
             else if (board[i][j] == Player::CircleBalck) {
                 drawCircle(window, j * cellSize, i * cellSize);
             }
         }
     }
-
     window.display();
 }
 
@@ -85,6 +86,8 @@ void Morpion::drawCircleR(sf::RenderWindow& window, float x, float y) {
 }
 
 void Morpion::drawCircle(sf::RenderWindow& window, float x, float y) {
+
+    OutputDebugStringA("dessins \n");
     sf::CircleShape circle(cellSize / 2 - 10);
     circle.setPosition(x + 10, y + 10);
     circle.setOutlineThickness(2);
@@ -99,7 +102,7 @@ std::string getPlayerName() {
     //if (!font.loadFromFile("Billie-Eilish.ttf")) {
     //    return "erreur font";  // Ou une autre valeur d'erreur si nécessaire
     //}
-//}
+
 
     sf::Text text;
     text.setFont(font);
@@ -141,12 +144,11 @@ std::string getPlayerName() {
     return inputText.toAnsiString();
 }
 
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
-    
+int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+
     char cServerCallback[512];
     client(cServerCallback);
-
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+   
     // Définir les paramètres de la fenêtre
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
@@ -164,28 +166,24 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
     // Afficher la fenêtre
     ShowWindow(hWnd, nCmdShow);
-
+    
     // Boucle de messages
     MSG msg = {};
-    while (GetMessage(&msg, NULL, 0, 0)) {
+   /* while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-    }
+    }*/
+
+    OutputDebugStringA("toujour co \n");
     //std::string player1Name;
     //std::string player2Name;
-    //std::string player2Name;
-
-    std::cout << "Entrez le nom du Joueur 1 (X) : ";
-    std::cin >> player1Name;
-
-    sendData(player1Name.c_str());
-
-    std::cout << "Entrez le nom du Joueur 2 (O) : ";
-    std::cin >> player2Name;
-
-    sendData(player2Name.c_str());*/
-
-   /* std::string player1Name = getPlayerName();
+    //std::cout << "Entrez le nom du Joueur 1 (X) : ";
+    //std::cin >> player1Name;
+    //sendData(player1Name.c_str());
+    //std::cout << "Entrez le nom du Joueur 2 (O) : ";
+    //std::cin >> player2Name;
+    //sendData(player2Name.c_str());
+ /*   std::string player1Name = getPlayerName();
     if (player1Name.empty()) {
         MessageBox(NULL, L"Nom de joueur non valide. Fermeture de l'application.", L"Erreur", MB_OK | MB_ICONERROR);
         return 1;
@@ -193,7 +191,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
     sendData(player1Name.c_str());*/
 
-   
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     Morpion game;
@@ -206,7 +203,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
                 killClient();
             }
 
-            game.handleEvent(event);
+            game.handleEvent(event, window);
         }
 
         game.draw(window);
@@ -215,6 +212,5 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
             window.close();
         }
     }
-
     return 0;
 }

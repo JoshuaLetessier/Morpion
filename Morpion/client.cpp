@@ -7,14 +7,13 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-#define ADRESS_IP "127.0.0.1"
+#define ADRESS_IP "14.0.0.1"
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
 inline int client(char* callback)
 {
-
     WSADATA wsaData;
 
     struct addrinfo* result = NULL;
@@ -47,7 +46,6 @@ inline int client(char* callback)
 
     ptr = result;
     // Attempt to connect to an address until one succeeds
-    //for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
         // Create a SOCKET for connecting to server
     ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
@@ -66,8 +64,6 @@ inline int client(char* callback)
         ConnectSocket = INVALID_SOCKET;
         //continue;
     }
-    //break;
-// }
 
     freeaddrinfo(result);
 
@@ -75,11 +71,10 @@ inline int client(char* callback)
 
     if (ConnectSocket == INVALID_SOCKET) {
         printf("Unable to connect to server! %ld\n", WSAGetLastError());
-       
+
         WSACleanup();
         return 1;
     }
-
 
     const char* data = "connexion";
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
@@ -90,10 +85,7 @@ inline int client(char* callback)
         return 1;
     }
 
-
-
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-
 
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if (iResult > 0) {
@@ -104,13 +96,9 @@ inline int client(char* callback)
     }
     else {
         printf("recv failed with error: %d\n", WSAGetLastError());
-    }
-
-
-
+    }   
     return 0;
 }
-
 
 inline int killClient()
 {
@@ -127,8 +115,8 @@ inline int killClient()
 
 inline int sendData(const char data[4096])
 {
-
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
+    OutputDebugStringA("fonction envoie \n");
 
     return 0;
 }
