@@ -12,7 +12,7 @@ static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
-inline int client()
+inline int client(char* callback)
 {
 
     WSADATA wsaData;

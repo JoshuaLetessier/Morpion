@@ -5,20 +5,21 @@
 #include "client.cpp"
 
 
+
 const int gridSize = 3;
 const int cellSize = 100;
 
-inline int client();
+inline int client(char* callback);
 inline int killClient();
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_CREATE:
         // Exécuter le client lorsque la fenêtre est créée
-        if (client() != 0) {
-            MessageBox(hwnd, L"Erreur lors de l'exécution du client", L"Erreur", MB_OK | MB_ICONERROR);
-            PostQuitMessage(1);
-        }
+        //if (client(callback) != 0) {
+        //    MessageBox(hwnd, L"Erreur lors de l'exécution du client", L"Erreur", MB_OK | MB_ICONERROR);
+        //    PostQuitMessage(1);
+        //}
         break;
     case WM_DESTROY:
         // Terminer le client et quitter l'application lors de la fermeture de la fenêtre
@@ -41,16 +42,9 @@ void Morpion::handleEvent(sf::Event& event) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
 
-        // case est valide et non occupée
-        if (mouseX >= 0 && mouseX < gridSize && mouseY >= 0 && mouseY < gridSize &&
-            board[mouseY][mouseX] == Player::None) {
-            board[mouseY][mouseX] = currentPlayer;
-            switchPlayer();
-
-            std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
-            const char* data = dataConvert.c_str();
-            sendData(data);
-        }
+        std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
+        const char* data = dataConvert.c_str();
+        sendData(data);
     }
 }
 
@@ -81,47 +75,6 @@ void Morpion::draw(sf::RenderWindow& window) {
     window.display();
 }
 
-bool Morpion::checkGameOver() const {
-    // Vérifier les lignes et colonnes
-    for (int i = 0; i < gridSize; ++i) {
-        if (board[i][0] != Player::None &&
-            board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
-            return true;  // Victoire sur la ligne i
-        }
-
-        if (board[0][i] != Player::None &&
-            board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
-            return true;  // Victoire sur la colonne i
-        }
-    }
-
-    // Vérifier les diagonales
-    if (board[0][0] != Player::None &&
-        board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
-        return true;  // Victoire sur la diagonale principale
-    }
-
-    if (board[0][2] != Player::None &&
-        board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
-        return true;  // Victoire sur l'autre diagonale
-    }
-
-    // Vérifier l'égalité
-    for (int i = 0; i < gridSize; ++i) {
-        for (int j = 0; j < gridSize; ++j) {
-            if (board[i][j] == Player::None) {
-                return false;  // Il reste des cases vides, le jeu n'est pas égal
-            }
-        }
-    }
-
-    return true;  // Toutes les cases sont remplies, la partie est égale
-}
-
-void Morpion::switchPlayer() {
-    currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
-}
-
 void Morpion::drawCircleR(sf::RenderWindow& window, float x, float y) {
     sf::CircleShape circle(cellSize / 2 - 10);
     circle.setPosition(x + 10, y + 10);
@@ -140,55 +93,59 @@ void Morpion::drawCircle(sf::RenderWindow& window, float x, float y) {
     window.draw(circle);
 }
 
-//std::string getPlayerName() {
-//    sf::RenderWindow nameWindow(sf::VideoMode(400, 200), "Entrez votre nom");
-//    sf::Font font;
-//    if (!font.loadFromFile("C:\\Users\\Faoll\\Downloads\\namecat\\Namecat.ttf")) {
-//        return "erreur font";  // Ou une autre valeur d'erreur si nécessaire
-//    }
-//
-//
-//    sf::Text text;
-//    text.setFont(font);
-//    text.setCharacterSize(24);
-//    text.setFillColor(sf::Color::White);
-//    text.setPosition(50, 50);
-//    text.setString("Entrez votre nom : ");
-//
-//    sf::String inputText;
-//    sf::Text inputDisplay;
-//    inputDisplay.setFont(font);
-//    inputDisplay.setCharacterSize(24);
-//    inputDisplay.setFillColor(sf::Color::White);
-//    inputDisplay.setPosition(50, 100);
-//
-//    while (nameWindow.isOpen()) {
-//        sf::Event event;
-//        while (nameWindow.pollEvent(event)) {
-//            if (event.type == sf::Event::Closed) {
-//                nameWindow.close();
-//            }
-//            else if (event.type == sf::Event::TextEntered) {
-//                if (event.text.unicode == 8 && !inputText.isEmpty()) { // Backspace
-//                    inputText.erase(inputText.getSize() - 1, 1);
-//                }
-//                else if (event.text.unicode >= 32 && event.text.unicode < 128) {
-//                    inputText += event.text.unicode;
-//                }
-//                inputDisplay.setString(inputText);
-//            }
-//        }
-//
-//        nameWindow.clear();
-//        nameWindow.draw(text);
-//        nameWindow.draw(inputDisplay);
-//        nameWindow.display();
-//    }
-//
-//    return inputText.toAnsiString();
-//}
+std::string getPlayerName() {
+    sf::RenderWindow nameWindow(sf::VideoMode(400, 200), "Morpion");
+    sf::Font font;
+    //if (!font.loadFromFile("Billie-Eilish.ttf")) {
+    //    return "erreur font";  // Ou une autre valeur d'erreur si nécessaire
+    //}
+
+
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
+    text.setPosition(50, 50);
+    text.setString("Entrez votre nom : ");
+
+    sf::String inputText;
+    sf::Text inputDisplay;
+    inputDisplay.setFont(font);
+    inputDisplay.setCharacterSize(24);
+    inputDisplay.setFillColor(sf::Color::White);
+    inputDisplay.setPosition(50, 100);
+
+    while (nameWindow.isOpen()) {
+        sf::Event event;
+        while (nameWindow.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                nameWindow.close();
+            }
+            else if (event.type == sf::Event::TextEntered) {
+                if (event.text.unicode == 8 && !inputText.isEmpty()) { // Backspace
+                    inputText.erase(inputText.getSize() - 1, 1);
+                }
+                else if (event.text.unicode >= 32 && event.text.unicode < 128) {
+                    inputText += event.text.unicode;
+                }
+                inputDisplay.setString(inputText);
+            }
+        }
+
+        nameWindow.clear();
+        nameWindow.draw(text);
+        nameWindow.draw(inputDisplay);
+        nameWindow.display();
+    }
+
+    return inputText.toAnsiString();
+}
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+    
+    char cServerCallback[512];
+    client(cServerCallback);
+
     // Définir les paramètres de la fenêtre
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
@@ -213,8 +170,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-
-    client();
 
     //std::string player1Name;
     //std::string player2Name;
@@ -253,18 +208,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
                 killClient();
             }
 
-            
-
             game.handleEvent(event);
         }
-       
+
         game.draw(window);
-        if (game.checkGameOver()) {
+        if (cServerCallback == "") {
             std::cout << "La partie est terminée !" << std::endl;
             window.close();
         }
     }
-
 
     return 0;
 }

@@ -9,6 +9,7 @@
 #include <conio.h>
 
 #include "Serve.hpp"
+#include "MorpionServer.hpp"
 
 
 // Need to link with Ws2_32.lib
@@ -204,7 +205,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         DispatchMessage(&msg);
 
     }
-
+    MorpionServer game;
 }
 
 

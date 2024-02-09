@@ -15,10 +15,13 @@
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
+static int iSendResult = 0;
+static int iResult = 0;
+static SOCKET ConnectSocket = INVALID_SOCKET;
+
 inline int __cdecl serve(void)
 {
     WSADATA wsaData;
-    int iResult;
 
     SOCKET ListenSocket = INVALID_SOCKET;
     SOCKET ClientSocket = INVALID_SOCKET;
@@ -26,7 +29,6 @@ inline int __cdecl serve(void)
     struct addrinfo* result = NULL;
     struct addrinfo hints;
 
-    int iSendResult;
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
 
@@ -137,6 +139,14 @@ inline int __cdecl serve(void)
     // cleanup
     closesocket(ClientSocket);
     WSACleanup();
+
+    return 0;
+}
+
+inline int sendData(const char data[4096])
+{
+
+    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
 
     return 0;
 }
