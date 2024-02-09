@@ -11,8 +11,6 @@
 #include <fstream>
 //#include <json\json.h>
 //#include "..\simdjson\simdjson.h"
-#include <nlohmann\json.hpp>
-using json = nlohmann::json;
 
 #include "Serve.cpp"
 
@@ -23,31 +21,8 @@ using json = nlohmann::json;
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-json save_morpion;
-
-void initJson() 
-{
-    
-}
-
-void importStringJson(std::string newString)
-{
-
-}
-
-void importBoolJson(bool newBool) 
-{
-
-}
-
-void importDateJson(std::time_t newDate)
-{
-
-}
-
 
 int __cdecl main(void)
 {
-    initJson();
-    //serve();
+    serve();
 }

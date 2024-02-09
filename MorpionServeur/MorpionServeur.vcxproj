@@ -135,10 +135,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Json.cpp" />
     <ClCompile Include="MorpionServeur.cpp" />
     <ClCompile Include="Serve.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Json.hpp" />
     <ClInclude Include="MorpionServer.hpp" />
     <ClInclude Include="Serve.hpp" />
   </ItemGroup>
