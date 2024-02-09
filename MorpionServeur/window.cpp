@@ -60,6 +60,39 @@ LPSOCKET_INFORMATION SocketInfoList;
 WSAEVENT events[2]; //tab event par socket
 DWORD numEvents = 0;  //nb event dans tab
 
+//assynchrone base
+void AddSocketEvent(SOCKET socket)
+{
+	events[numEvents++] = WSACreateEvent();
+	WSAEventSelect(socket, events[numEvents - 1], FD_READ | FD_WRITE | FD_CLOSE);
+}
+
+void ProcessSocketEvent(DWORD socketIndex) {
+	// ... (Traitement de la lecture, de l'écriture, de la fermeture, etc.)
+}
+
+void AsyncServerMain() {
+	while (true) {
+		// Attendre de manière asynchrone l'un des événements
+		DWORD eventIndex = WSAWaitForMultipleEvents(numEvents, events, FALSE, WSA_INFINITE, FALSE);
+
+		// Réagir à l'événement correspondant
+		if (eventIndex != WSA_WAIT_FAILED) {
+			// Récupérer l'indice réel de l'événement
+			eventIndex -= WSA_WAIT_EVENT_0;
+
+			// Traiter l'événement associé au socket correspondant à l'indice eventIndex
+			ProcessSocketEvent(eventIndex);
+
+			// Réinitialiser l'événement pour pouvoir l'utiliser à nouveau
+			WSAResetEvent(events[eventIndex]);
+		}
+	}
+}
+
+
+
+
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 	MSG msg;
 	DWORD Ret;
@@ -417,32 +450,3 @@ HWND MakeWorkerWindow(void)
 
 
 
-//assynchrone base
-void AddSocketEvent(SOCKET socket)
-{
-	events[numEvents++] = WSACreateEvent();
-	WSAEventSelect(socket, events[numEvents - 1], FD_READ | FD_WRITE | FD_CLOSE);
-}
-
-void AsyncServerMain() {
-	while (true) {
-		// Attendre de manière asynchrone l'un des événements
-		DWORD eventIndex = WSAWaitForMultipleEvents(numEvents, events, FALSE, WSA_INFINITE, FALSE);
-
-		// Réagir à l'événement correspondant
-		if (eventIndex != WSA_WAIT_FAILED) {
-			// Récupérer l'indice réel de l'événement
-			eventIndex -= WSA_WAIT_EVENT_0;
-
-			// Traiter l'événement associé au socket correspondant à l'indice eventIndex
-			ProcessSocketEvent(eventIndex);
-
-			// Réinitialiser l'événement pour pouvoir l'utiliser à nouveau
-			WSAResetEvent(events[eventIndex]);
-		}
-	}
-}
-
-void ProcessSocketEvent(DWORD socketIndex) {
-	// ... (Traitement de la lecture, de l'écriture, de la fermeture, etc.)
-}
