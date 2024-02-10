@@ -7,6 +7,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -32,6 +33,8 @@ inline int  serve(void)
     int iSendResult;
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
+
+    Json save;
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -74,6 +77,17 @@ inline int  serve(void)
     }
 
     freeaddrinfo(result);
+    //save.importListenSocketJson(result);
+    /*char ip[INET_ADDRSTRLEN];
+    if (inet_ntop(result->ai_family, result->ai_addr, ip, result->ai_addrlen) != NULL) {
+        printf("IP: %s\n", ip);
+    }
+    freeaddrinfo(result);*/
+    /*struct sockaddr_in* psai = (struct sockaddr_in*)pai->ai_addr;
+    char ip[INET_ADDRSTRLEN];
+    if (inet_ntop(pai->ai_family, &(psai->sin_addr), ip, INET_ADDRSTRLEN) != NULL) {
+        printf("IP: %s\n", ip);
+    }*/
 
     iResult = listen(ListenSocket, SOMAXCONN);
     if (iResult == SOCKET_ERROR) {
@@ -93,6 +107,7 @@ inline int  serve(void)
         return 1;
     }
     printf("client present \n");
+
     const char* message = "Hello from server!";
     iSendResult = send(ClientSocket, message, (int)strlen(message), 0);
     if (iSendResult == SOCKET_ERROR) {

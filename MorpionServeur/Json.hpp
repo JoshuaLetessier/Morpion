@@ -1,4 +1,8 @@
 #pragma once
+
+#include <nlohmann\json.hpp>
+using json = nlohmann::json;
+
 class Json
 {
 public:
@@ -6,7 +10,7 @@ public:
 	~Json();
 
 	// Interaction save_systeme
-	void importListenSocketJson(SOCKET newSocket);
+	void importListenSocketJson(addrinfo* newSocket);
 	void importPlayerSocketJson(SOCKET newPlayerSocket);
 	void importTurnJson(bool newTurn);
 	void importDateJson(std::time_t newDate);

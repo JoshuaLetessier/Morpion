@@ -1,8 +1,8 @@
 // Librairies necessaires
 #include <fstream>
+#include "Serve.cpp"/*
 #include <nlohmann\json.hpp>
-using json = nlohmann::json;
-#include "Serve.cpp"
+using json = nlohmann::json;*/
 
 // Le header après les forwards declare
 #include "Json.hpp"
@@ -22,11 +22,12 @@ Json::~Json()
 /*                 Interaction save_systeme                */
 /////////////////////////////////////////////////////////////
 
-void Json::importListenSocketJson(SOCKET newSocket) // Enregistre le socket d'écoute du serveur
+void Json::importListenSocketJson(addrinfo* newSocket) // Enregistre le socket d'écoute du serveur
 {
 	if (!save_systeme["socket_info"]["listen_socket"])
 	{
-		save_systeme["socket_info"]["listen_socket"] = newSocket;
+		
+		//save_systeme["socket_info"]["listen_socket"] = newSocket;
 	}
 }
 
@@ -40,6 +41,7 @@ void Json::importPlayerSocketJson(SOCKET newPlayerSocket) // Enregistre les sock
 	{
 		save_systeme["socket_info"]["player2_socket"] = newPlayerSocket;
 	}
+	std::cout << save_systeme << std::endl;
 }
 
 void Json::importTurnJson(bool newTurn) // Enregistre le tour du joueur en cours
