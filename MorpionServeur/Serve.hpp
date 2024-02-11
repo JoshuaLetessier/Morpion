@@ -1,19 +1,18 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <stdio.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
 
-#pragma prefast(suppress : 28251, "Cette instance contient aucune annotation.")
+class Server {
+public:
+    Server();
+    ~Server();
 
-#define DEFAULT_PORT "27015"
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
-#pragma comment(lib, "ws2_32.lib")
+    void Run();
+    inline int serve(void);
 
-class Serve {
+private:
+    static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param);
+
+    HINSTANCE hInstance;
+    HWND hwnd;
 
 public:
 
