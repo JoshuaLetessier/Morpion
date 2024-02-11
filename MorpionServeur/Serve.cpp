@@ -1,5 +1,3 @@
-#undef UNICODE
-
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
@@ -11,16 +9,69 @@
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "user32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-#include "Json.hpp"
+//#include "Json.hpp"
+#include "Serve.hpp"
 
 
-inline int  serve(void)
-{
+Server::Server() : hInstance(nullptr), hwnd(nullptr) {}
+
+Server::~Server() {}
+
+void Server::Run() {
+    hInstance = GetModuleHandle(nullptr);
+
+    const wchar_t CLASS_NAME[] = L"MorpionWindowClass";
+
+    WNDCLASS wc = {};
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = CLASS_NAME;
+
+    RegisterClass(&wc);
+
+    hwnd = CreateWindowEx(
+        0, CLASS_NAME, L"Tic-Tac-Toe Server", WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
+        nullptr, nullptr, hInstance, this);
+
+
+
+
+    if (hwnd == nullptr) {
+        return;
+    }
+
+    ShowWindow(hwnd, SW_SHOWNORMAL);
+
+    serve();
+
+    MSG msg = {};
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
+
+LRESULT CALLBACK Server::WndProc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param) {
+    switch (message) {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+
+    default:
+        return DefWindowProc(hwnd, message, w_param, l_param);
+    }
+
+    return 0;
+}
+
+inline int Server::serve(void) {
     WSADATA wsaData;
     int iResult;
 
@@ -34,7 +85,7 @@ inline int  serve(void)
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
 
-    Json save;
+    //Json save;
 
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);

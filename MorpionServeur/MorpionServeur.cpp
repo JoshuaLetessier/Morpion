@@ -12,7 +12,7 @@
 //#include <json\json.h>
 //#include "..\simdjson\simdjson.h"
 
-#include "Serve.cpp"
+#include "Serve.hpp"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -22,7 +22,9 @@
 #define DEFAULT_PORT "27015"
 
 
-int __cdecl main(void)
-{
-    serve();
+
+int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+    Server server;
+    server.Run();
+    return 0;
 }
