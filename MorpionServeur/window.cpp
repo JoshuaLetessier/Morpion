@@ -17,10 +17,11 @@
 // #pragma comment (lib, "Mswsock.lib")
 #define PORT 27015
 #define DATA_BUFSIZE 8192
+#define DEFAULT_BUFLEN 512
 
 #define WM_SOCKET (WM_USER + 1)
 
-
+#define MAX_CLIENTS 2
 
 // typedef definition
 
@@ -40,7 +41,11 @@ typedef struct _SOCKET_INFORMATION {
 
 	struct _SOCKET_INFORMATION* Next;
 
+	const char* color;
+
 } SOCKET_INFORMATION, * LPSOCKET_INFORMATION;
+
+SOCKET_INFORMATION clientSockets[MAX_CLIENTS];
 
 // Prototypes
 
@@ -57,41 +62,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 // Global var
 
 LPSOCKET_INFORMATION SocketInfoList;
-WSAEVENT events[2]; //tab event par socket
-DWORD numEvents = 0;  //nb event dans tab
 
-//assynchrone base
-void AddSocketEvent(SOCKET socket)
-{
-	events[numEvents++] = WSACreateEvent();
-	WSAEventSelect(socket, events[numEvents - 1], FD_READ | FD_WRITE | FD_CLOSE);
-}
-
-void ProcessSocketEvent(DWORD socketIndex) {
-	// ... (Traitement de la lecture, de l'écriture, de la fermeture, etc.)
-}
-
-void AsyncServerMain() {
-	while (true) {
-		// Attendre de manière asynchrone l'un des événements
-		DWORD eventIndex = WSAWaitForMultipleEvents(numEvents, events, FALSE, WSA_INFINITE, FALSE);
-
-		// Réagir à l'événement correspondant
-		if (eventIndex != WSA_WAIT_FAILED) {
-			// Récupérer l'indice réel de l'événement
-			eventIndex -= WSA_WAIT_EVENT_0;
-
-			// Traiter l'événement associé au socket correspondant à l'indice eventIndex
-			ProcessSocketEvent(eventIndex);
-
-			// Réinitialiser l'événement pour pouvoir l'utiliser à nouveau
-			WSAResetEvent(events[eventIndex]);
-		}
-	}
-}
-
-
-
+char recvbuf[DEFAULT_BUFLEN];
 
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 	MSG msg;
@@ -102,8 +74,8 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	WSADATA wsaData;
 
 	MorpionServer Mserve;
-	
-	Mserve.main();
+
+	//Mserve.main();
 
 	if ((Window = MakeWorkerWindow()) == NULL)
 	{
@@ -160,27 +132,26 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 
 	// Translate and dispatch window messages for the application thread
 
-	//while (Ret = GetMessage(&msg, NULL, 0, 0))
-	//{
-	//	if (Ret == -1)
-	//	{
-	//		//printf("\nGetMessage() failed with error %d\n", GetLastError());
-	//		return 1;
-	//	}
-	//	else
-	//	{
-	//		//printf("\nGetMessage() is pretty fine!\n");
-	//	}
+	while (Ret = GetMessage(&msg, NULL, 0, 0))
+	{
+		if (Ret == -1)
+		{
+			//printf("\nGetMessage() failed with error %d\n", GetLastError());
+			return 1;
+		}
+		else
+		{
+			//printf("\nGetMessage() is pretty fine!\n");
+		}
 
-	//	//printf("Translating a message...\n");
+		//printf("Translating a message...\n");
 
-	//	TranslateMessage(&msg);
+		TranslateMessage(&msg);
 
-	//	//printf("Dispatching a message...\n");
+		//printf("Dispatching a message...\n");
 
-	//	DispatchMessage(&msg);
-	//}
-	AsyncServerMain();
+		DispatchMessage(&msg);
+	}
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -228,7 +199,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// Create a socket information structure to associate with the socket for processing I/O
 
 				CreateSocketInformation(Accept);
-				AddSocketEvent(Accept);
+
 				printf("Socket number  connected\n");
 
 				WSAAsyncSelect(Accept, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
@@ -276,6 +247,29 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						OutputDebugStringA(SocketInfo->DataBuf.buf);
 
 						SocketInfo->BytesRECV = RecvBytes;
+
+						 int result = recv(SocketInfo->Socket, recvbuf, (int)strlen(recvbuf), 0);
+						 if (result > 0)
+						 {
+							 printf("%.*s\n", result, recvbuf);
+						 }
+
+						 if (strcmp(SocketInfo[0].color, "black") == 0) {
+							 char data[20];
+							 sprintf_s(data, sizeof(data), " %d", result);
+
+							 // Envoie les données à l'autre socket
+							 send(SocketInfo[1].Socket, data, (int)strlen(data), 0);
+						 }
+						 else
+						 {
+							 char data[20];
+							 sprintf_s(data, sizeof(data), " %d", result);
+
+							 // Envoie les données à l'autre socket
+							 send(SocketInfo[2].Socket, data, (int)strlen(data), 0);
+						 }
+						
 
 					}
 
@@ -341,13 +335,34 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CreateSocketInformation(SOCKET s)
 {
 	LPSOCKET_INFORMATION SI;
-	if ((SI = (LPSOCKET_INFORMATION)GlobalAlloc(GPTR, sizeof(SOCKET_INFORMATION))) == NULL)
-	{
-		printf("GlobalAlloc() failed with error %d\n", GetLastError());
-		return;
+	for (int i = 0; i < MAX_CLIENTS; ++i) {
+		if ((SI = (LPSOCKET_INFORMATION)GlobalAlloc(GPTR, sizeof(SOCKET_INFORMATION))) == NULL)
+		{
+			printf("GlobalAlloc() failed with error %d\n", GetLastError());
+			
+		}
+		else
+		{
+			printf("GlobalAlloc() for SOCKET_INFORMATION is OK!\n");
+			if (i == 0)
+			{
+				const char* colorPlayer = "black";
+				send(s, colorPlayer, (int)strlen(colorPlayer),0);
+				SI->color = colorPlayer;
+			}
+			else
+			{
+				const char* colorPlayer = "black";
+				send(s, colorPlayer, (int)strlen(colorPlayer), 0);
+				SI->color = colorPlayer;
+			}
+		}
+			
+
+		
 	}
-	else
-		printf("GlobalAlloc() for SOCKET_INFORMATION is OK!\n");
+
+
 
 	// Prepare SocketInfo structure for use
 
@@ -447,6 +462,3 @@ HWND MakeWorkerWindow(void)
 	return Window;
 
 }
-
-
-

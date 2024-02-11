@@ -10,6 +10,8 @@ const int cellSize = 100;
 inline int client(char* callback);
 inline int killClient();
 
+
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_CREATE:
@@ -66,10 +68,10 @@ void Morpion::draw(sf::RenderWindow& window) {
 
             // Dessiner X ou O
             if (board[i][j] == Player::CircleRed) {
-                drawCircleR(window, j * cellSize, i * cellSize);
+                //drawCircleR(window, j * cellSize, i * cellSize);
             }
             else if (board[i][j] == Player::CircleBalck) {
-                drawCircle(window, j * cellSize, i * cellSize);
+               // drawCircle(window, j * cellSize, i * cellSize);
             }
         }
     }

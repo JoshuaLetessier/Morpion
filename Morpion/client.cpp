@@ -89,6 +89,8 @@ inline int client(char* callback)
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if (iResult > 0) {
         printf("Message received from server: %.*s\n", iResult, recvbuf);
+
+        
     }
     else if (iResult == 0) {
         printf("Connection closed by server...\n");
