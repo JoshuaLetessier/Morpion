@@ -12,25 +12,7 @@ inline int killClient();
 
 
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-    case WM_CREATE:
-        // Exécuter le client lorsque la fenêtre est créée
-        //if (client(callback) != 0) {
-        //    MessageBox(hwnd, L"Erreur lors de l'exécution du client", L"Erreur", MB_OK | MB_ICONERROR);
-        //    PostQuitMessage(1);
-        //}
-        break;
-    case WM_DESTROY:
-        // Terminer le client et quitter l'application lors de la fermeture de la fenêtre
-        killClient();
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
-    return 0;
-}
+
 
 Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     // Initialiser la grille avec des valeurs par défaut
@@ -149,52 +131,8 @@ std::string getPlayerName() {
     return inputText.toAnsiString();
 }
 
-int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+int main() {
 
-    char cServerCallback[512];
-    client(cServerCallback);
-   
-    // Définir les paramètres de la fenêtre
-    WNDCLASS wc = {};
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = L"MainWindowClass";
-
-    // Enregistrer la classe de fenêtre
-    RegisterClass(&wc);
-
-    // Créer la fenêtre
-    HWND hWnd = CreateWindowEx(0, L"MainWindowClass", L"Fenêtre Windows avec connexion au serveur", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
-    if (hWnd == NULL) {
-        return 1;
-    }
-
-    // Afficher la fenêtre
-    ShowWindow(hWnd, nCmdShow);
-    
-    // Boucle de messages
-    MSG msg = {};
-   /* while (GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }*/
-
-    OutputDebugStringA("toujour co \n");
-    //std::string player1Name;
-    //std::string player2Name;
-    //std::cout << "Entrez le nom du Joueur 1 (X) : ";
-    //std::cin >> player1Name;
-    //sendData(player1Name.c_str());
-    //std::cout << "Entrez le nom du Joueur 2 (O) : ";
-    //std::cin >> player2Name;
-    //sendData(player2Name.c_str());
- /*   std::string player1Name = getPlayerName();
-    if (player1Name.empty()) {
-        MessageBox(NULL, L"Nom de joueur non valide. Fermeture de l'application.", L"Erreur", MB_OK | MB_ICONERROR);
-        return 1;
-    }
-
-    sendData(player1Name.c_str());*/
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
@@ -213,10 +151,7 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
         }
         
         game.draw(window);
-        if (cServerCallback == "") {
-            std::cout << "La partie est terminée !" << std::endl;
-            window.close();
-        }
+
     }
     return 0;
 }

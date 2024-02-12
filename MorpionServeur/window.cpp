@@ -67,7 +67,7 @@ LPSOCKET_INFORMATION SocketInfoList;
 char recvbuf[DEFAULT_BUFLEN];
 bool firstSocket = true;
 
-int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
 	MSG msg;
 	DWORD Ret;
 	SOCKET Listen;
@@ -77,7 +77,6 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 
 	MorpionServer Mserve;
 
-	//Mserve.main();
 
 	if ((Window = MakeWorkerWindow()) == NULL)
 	{
@@ -473,8 +472,7 @@ HWND MakeWorkerWindow(void)
 	}
 	else
 		printf("CreateWindow() is OK!\n");
-
-	ShowWindow(Window, SW_SHOW);
+	//ShowWindow(Window, SW_SHOW);
 	return Window;
 
 }
