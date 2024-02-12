@@ -8,8 +8,11 @@
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 #define ADRESS_IP "127.0.0.1"
+
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
+
+
 
 inline int client(char* callback)
 {
@@ -19,9 +22,11 @@ inline int client(char* callback)
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
 
-    ZeroMemory(&hints, sizeof(hints));
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
+    
+    ZeroMemory(&hints, sizeof(hints));
+    
 
     // Initialize Winsock 
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -119,5 +124,17 @@ inline int sendData(const char data[4096])
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
     OutputDebugStringA("fonction envoie \n");
 
+    return 0;
+}
+
+inline int recvData()
+{
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    if (iResult > 0) {
+        printf("Message received from server: %.*s\n", iResult, recvbuf);
+
+    }
     return 0;
 }

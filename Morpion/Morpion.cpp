@@ -37,7 +37,7 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
 
-void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
+bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
@@ -51,12 +51,15 @@ void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
         const char* data = dataConvert.c_str();
         OutputDebugStringA("event detecte \n");
         sendData(data);
+
+        return true;
     }
+    return false;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
     window.clear();
-
+    
     // Dessiner la grille
     for (int i = 0; i < gridSize; ++i) {
         for (int j = 0; j < gridSize; ++j) {
@@ -68,10 +71,10 @@ void Morpion::draw(sf::RenderWindow& window) {
 
             // Dessiner X ou O
             if (board[i][j] == Player::CircleRed) {
-                //drawCircleR(window, j * cellSize, i * cellSize);
+                drawCircleR(window, j * cellSize, i * cellSize);
             }
             else if (board[i][j] == Player::CircleBalck) {
-               // drawCircle(window, j * cellSize, i * cellSize);
+                drawCircle(window, j * cellSize, i * cellSize);
             }
         }
     }
@@ -205,9 +208,10 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
                 killClient();
             }
 
-            game.handleEvent(event, window);
+            if(game.handleEvent(event, window))
+                recvData(); 
         }
-
+        
         game.draw(window);
         if (cServerCallback == "") {
             std::cout << "La partie est terminée !" << std::endl;

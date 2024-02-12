@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
+#include <string>
 
 #include "MorpionServer.hpp"
 
@@ -64,6 +65,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LPSOCKET_INFORMATION SocketInfoList;
 
 char recvbuf[DEFAULT_BUFLEN];
+bool firstSocket = true;
 
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 	MSG msg;
@@ -255,11 +257,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						 }
 
 						 if (strcmp(SocketInfo[0].color, "black") == 0) {
-							 char data[20];
-							 sprintf_s(data, sizeof(data), " %d", result);
+							 std::string data;
+							 data.resize(20);
+							 sprintf_s(&data[0], data.size(), " %d", result);
 
 							 // Envoie les données à l'autre socket
-							 send(SocketInfo[1].Socket, data, (int)strlen(data), 0);
+							 send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici à régler 
 						 }
 						 else
 						 {
@@ -267,7 +270,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							 sprintf_s(data, sizeof(data), " %d", result);
 
 							 // Envoie les données à l'autre socket
-							 send(SocketInfo[2].Socket, data, (int)strlen(data), 0);
+							 //send(SocketInfo[2].Socket, data, (int)strlen(data), 0);
 						 }
 						
 
@@ -338,45 +341,58 @@ void CreateSocketInformation(SOCKET s)
 	for (int i = 0; i < MAX_CLIENTS; ++i) {
 		if ((SI = (LPSOCKET_INFORMATION)GlobalAlloc(GPTR, sizeof(SOCKET_INFORMATION))) == NULL)
 		{
-			printf("GlobalAlloc() failed with error %d\n", GetLastError());
-			
+			printf("GlobalAlloc() failed with error %d\n", GetLastError());	
 		}
 		else
 		{
 			printf("GlobalAlloc() for SOCKET_INFORMATION is OK!\n");
-			if (i == 0)
+			
+			if (firstSocket)
 			{
 				const char* colorPlayer = "black";
 				send(s, colorPlayer, (int)strlen(colorPlayer),0);
+
+				SI->Socket = s;
+
+				SI->RecvPosted = FALSE;
+
+				SI->BytesSEND = 0;
+
+				SI->BytesRECV = 0;
+
+				SI->Next = SocketInfoList;
+
+				SocketInfoList = SI;
+
 				SI->color = colorPlayer;
+
+				firstSocket = false;
 			}
 			else
 			{
-				const char* colorPlayer = "black";
+				const char* colorPlayer = "red";
 				send(s, colorPlayer, (int)strlen(colorPlayer), 0);
+
+				SI->Socket = s;
+
+				SI->RecvPosted = FALSE;
+
+				SI->BytesSEND = 0;
+
+				SI->BytesRECV = 0;
+
+				SI->Next = SocketInfoList;
+
+				SocketInfoList = SI;
+
 				SI->color = colorPlayer;
 			}
-		}
-			
-
-		
+		}	
 	}
-
-
 
 	// Prepare SocketInfo structure for use
 
-	SI->Socket = s;
-
-	SI->RecvPosted = FALSE;
-
-	SI->BytesSEND = 0;
-
-	SI->BytesRECV = 0;
-
-	SI->Next = SocketInfoList;
-
-	SocketInfoList = SI;
+	
 }
 
 LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
