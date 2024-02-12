@@ -7,7 +7,7 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-#define ADRESS_IP "127.0.0.1"
+#define ADRESS_IP "2a02:8428:dbf3:2101:2c1f:369f:19a3:f3a9"
 
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
@@ -36,7 +36,7 @@ inline int client(char* callback)
     }
 
     ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
+    hints.ai_family = AF_INET6;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
@@ -51,7 +51,7 @@ inline int client(char* callback)
     ptr = result;
     // Attempt to connect to an address until one succeeds
 
-        // Create a SOCKET for connecting to server
+    // Create a SOCKET for connecting to server
     ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (ConnectSocket == INVALID_SOCKET) {
         printf("socket failed with error: %ld\n", WSAGetLastError());

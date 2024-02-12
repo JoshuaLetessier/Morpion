@@ -1,5 +1,6 @@
 #pragma once 
 #include <vector>
+#include "Json.hpp"
 class MorpionServer {
 
 public:
@@ -15,4 +16,13 @@ public:
 	void switchPlayer();
 	inline int sendData(const char data[4096]);
 	int __cdecl main(void);
+
+private:
+	const int gridSize = 3;
+	const int cellSize = 100;
+	int iSendResult;
+	int iResult;
+	SOCKET ConnectSocket;
+	bool turn;
+	Json save;
 };

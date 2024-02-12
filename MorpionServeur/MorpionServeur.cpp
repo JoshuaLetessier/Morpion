@@ -12,23 +12,13 @@
 #include <stdio.h>
 #include <fstream>
 
-//#include <nlohmann\json.hpp>
-//using json = nlohmann::json;
-
-#include "MorpionServer.hpp"
 #pragma comment (lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 #define ADRESS_IP "10.1.144.16"
 
-std::string newName = "Leo";
-const int gridSize = 3;
-const int cellSize = 100;
-static int iSendResult = 0;
-static int iResult = 0;
-static SOCKET ConnectSocket = INVALID_SOCKET;
-
+#include "MorpionServer.hpp"
 
 MorpionServer::MorpionServer()
 {
@@ -95,36 +85,25 @@ bool MorpionServer::checkGameOver() const {
     return true;  // Toutes les cases sont remplies, la partie est �gale
 }
 
-void MorpionServer::switchPlayer() {
+void MorpionServer::switchPlayer() 
+{
+    turn != turn;
+    save.importTurnJson(turn);
     currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
 }
 
 inline int MorpionServer::sendData(const char data[4096])
 {
-
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-
     return 0;
 }
 
-//void createJson()
-//{
-//    // Using user-defined (raw) string literals
-//    using namespace nlohmann::literals;
-//    json save_morpion = R"(
-//  { "name": "inconnu1", "victoire": false,  "date": 0 },
-//  { "name": "inconnu2", "victoire": false,  "date": 0 }
-//)"_json;
-//}
-
-void editJson(std::string newName, bool newVictory, std::time_t newDate)
-{
-
-}
-
-
 int __cdecl MorpionServer::main(void)
 {
+    iSendResult = 0;
+    iResult = 0;
+    ConnectSocket = INVALID_SOCKET;
+    turn = false;
     //MorpionServer game;
     OutputDebugStringA("on lance le serv \n");
     //game.serve();
