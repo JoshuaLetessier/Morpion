@@ -282,7 +282,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				}
 
-				// DO NOT BREAK HERE SINCE WE GOT A SUCCESSFUL RECV. Go ahead
+			break;
 
 				// and begin writing data to the client
 
