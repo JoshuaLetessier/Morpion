@@ -20,7 +20,7 @@
 
 
 inline int  serve(void)
-{
+{ 
     WSADATA wsaData;
     int iResult;
 

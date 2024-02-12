@@ -10,16 +10,19 @@ public:
 	~Json();
 
 	// Interaction save_systeme
-	void importListenSocketJson(addrinfo* newSocket);
-	void importPlayerSocketJson(SOCKET newPlayerSocket);
+	void importPlayerAdressJson(char newPlayerAdress);
 	void importTurnJson(bool newTurn);
 	void importDateJson(std::time_t newDate);
 
 	// Interaction save_morpion
-	void importName1Json(std::string newName);
-	void importName2Json(std::string newName);
-	void importMoveJson(std::string newMove);
+	void importName1Json(char newName);
+	void importName2Json(char newName);
+	void importMoveJson(const char* newMove);
 	void importVictoryJson(bool player1Victory);
+
+	// Interaction getters
+	std::string getMorpionValue(bool player1, std::string valueName);
+	std::string getSystemeValue(std::string valueName);
 
 
 private:

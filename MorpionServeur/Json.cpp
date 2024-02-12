@@ -1,5 +1,6 @@
 // Librairies necessaires
 #include <fstream>
+#include <format>
 #include "Serve.cpp"/*
 #include <nlohmann\json.hpp>
 using json = nlohmann::json;*/
@@ -22,46 +23,36 @@ Json::~Json()
 /*                 Interaction save_systeme                */
 /////////////////////////////////////////////////////////////
 
-void Json::importListenSocketJson(addrinfo* newSocket) // Enregistre le socket d'écoute du serveur
+void Json::importPlayerAdressJson(char newPlayerAdress) // Enregistre les sockets des joueurs lorsqu'elles sont différentes
 {
-	if (!save_systeme["socket_info"]["listen_socket"])
+	if (!save_systeme["player1_adress"])
 	{
-		
-		//save_systeme["socket_info"]["listen_socket"] = newSocket;
+		save_systeme["player1_adress"] = newPlayerAdress;
 	}
-}
-
-void Json::importPlayerSocketJson(SOCKET newPlayerSocket) // Enregistre les sockets des joueurs lorsqu'elles sont différentes
-{
-	if (!save_systeme["socket_info"]["player1_socket"])
+	else if (save_systeme["player1_adress"] != newPlayerAdress)
 	{
-		save_systeme["socket_info"]["player1_socket"] = newPlayerSocket;
+		save_systeme["player2_adress"] = newPlayerAdress;
 	}
-	else if (save_systeme["socket_info"]["player1_socket"] != newPlayerSocket)
-	{
-		save_systeme["socket_info"]["player2_socket"] = newPlayerSocket;
-	}
-	std::cout << save_systeme << std::endl;
 }
 
 void Json::importTurnJson(bool newTurn) // Enregistre le tour du joueur en cours
 {
-	if (!save_systeme["player_info"]["turn"])
+	if (!save_systeme["player_turn"])
 	{
-		save_systeme["player_info"]["turn"] = newTurn;
+		save_systeme["player_turn"] = newTurn;
 	}
 	else
 	{
-		save_systeme["player_info"].erase("turn");
-		save_systeme["player_info"]["turn"] = newTurn;
+		save_systeme.erase("player_turn");
+		save_systeme["player_turn"] = newTurn;
 	}
 }
 
 void Json::importDateJson(std::time_t newDate) // Enregistre la date de la partie
 {
-	if (!save_systeme["socket_info"]["date"])
+	if (!save_systeme["date"])
 	{
-		save_systeme["socket_info"]["date"] = newDate;
+		save_systeme["date"] = newDate;
 	}
 }
 
@@ -69,7 +60,7 @@ void Json::importDateJson(std::time_t newDate) // Enregistre la date de la parti
 /*                 Interaction save_morpion                */
 /////////////////////////////////////////////////////////////
 
-void Json::importName1Json(std::string newName) // Enregistre le nom du joueur 1
+void Json::importName1Json(char newName) // Enregistre le nom du joueur 1
 {
 	if (!save_morpion["player1"]["name"])
 	{
@@ -77,7 +68,7 @@ void Json::importName1Json(std::string newName) // Enregistre le nom du joueur 1
 	}
 }
 
-void Json::importName2Json(std::string newName) // Enregistre le nom du joueur 2
+void Json::importName2Json(char newName) // Enregistre le nom du joueur 2
 {
 	if (!save_morpion["player2"]["name"])
 	{
@@ -85,12 +76,14 @@ void Json::importName2Json(std::string newName) // Enregistre le nom du joueur 2
 	}
 }
 
-void Json::importMoveJson(std::string newMove) // Enregistre le dernier mouvement
+void Json::importMoveJson(const char* newMove) // Enregistre le dernier mouvement
 {
 	if (!save_morpion["player1"]["victory"] && !save_morpion["player2"]["victory"])
 	{
+		printf("coucou\n");
 		if (save_morpion["player1"]["turn"] == true )
 		{
+			printf("coucou\n");
 			if (!save_morpion["player1"]["move"])
 			{
 				save_morpion["player1"]["move"] = newMove;
@@ -99,6 +92,7 @@ void Json::importMoveJson(std::string newMove) // Enregistre le dernier mouvemen
 			{
 				save_morpion["player1"].erase("move");
 				save_morpion["player1"]["move"] = newMove;
+				std::cout << save_morpion << std::endl;
 			}
 		}
 		else
@@ -126,4 +120,18 @@ void Json::importVictoryJson(bool player1Victory) // Enregistre la victoire
 	{
 		save_morpion["player2"]["victory"] = !player1Victory;
 	}
+}
+
+////////////////////////////////////////////////////////
+/*                 Interaction getters                */
+////////////////////////////////////////////////////////
+
+std::string Json::getMorpionValue(bool player1, std::string valueName)
+{
+	return save_morpion[player1 ? "player1" : "player2"][valueName];
+}
+
+std::string Json::getSystemeValue(std::string valueName)
+{
+	return save_systeme[valueName];
 }
