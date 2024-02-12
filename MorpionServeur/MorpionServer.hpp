@@ -10,7 +10,7 @@ public:
 	std::vector<std::vector<Player>> board;
 	Player currentPlayer;
 	void handleEvent(int playerX, int playerY);
-	void draw();
+	void draw(const char* colorPlayer);
 	bool checkGameOver() const;
 	void switchPlayer();
 	inline int sendData(const char data[4096]);

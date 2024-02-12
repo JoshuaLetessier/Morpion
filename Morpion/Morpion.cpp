@@ -29,10 +29,12 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
             board[mouseY][mouseX] = currentPlayer;
         }
 
+
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
         OutputDebugStringA("event detecte \n");
         sendData(data);
+        recvData();
 
         return true;
     }

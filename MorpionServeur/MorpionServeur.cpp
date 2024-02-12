@@ -49,13 +49,18 @@ void MorpionServer::handleEvent(int playerX, int playerY)
     }
 }
 
-void MorpionServer::draw()
+void MorpionServer::draw(const char* colorPlayer)
 {
-    /*for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            printf("")
-        }
-    }*/
+    const char* ColorChange =  colorPlayer;
+
+    if (strcmp(colorPlayer, "black") == 0) {
+        OutputDebugStringA("bravo Jerem ta envoyé du noir \n");
+        sendData(ColorChange);
+    }
+    else if (strcmp(colorPlayer, "red") == 0) {
+        OutputDebugStringA("bravo Jerem ta envoyé du rouge\n");
+        sendData(ColorChange);
+    }
 }
 
 bool MorpionServer::checkGameOver() const {
@@ -91,19 +96,18 @@ bool MorpionServer::checkGameOver() const {
             }
         }
     }
-
     return true;  // Toutes les cases sont remplies, la partie est �gale
+    system("taskkill /F /T /IM '.exe");
 }
 
-void MorpionServer::switchPlayer() {
+void MorpionServer::switchPlayer()
+{
     currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
 }
 
 inline int MorpionServer::sendData(const char data[4096])
 {
-
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-
     return 0;
 }
 
@@ -128,6 +132,5 @@ int __cdecl MorpionServer::main(void)
     //MorpionServer game;
     OutputDebugStringA("on lance le serv \n");
     //game.serve();
-
     return 0;
 }

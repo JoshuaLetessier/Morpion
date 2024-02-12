@@ -109,7 +109,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\SFML-2.6.1\include;$(ProjectDir)..\jsoncppdist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML-2.6.1\lib</AdditionalLibraryDirectories>

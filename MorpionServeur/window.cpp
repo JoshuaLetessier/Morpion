@@ -67,7 +67,7 @@ LPSOCKET_INFORMATION SocketInfoList;
 char recvbuf[DEFAULT_BUFLEN];
 bool firstSocket = true;
 
-int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
+int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de windows
 	MSG msg;
 	DWORD Ret;
 	SOCKET Listen;
@@ -356,10 +356,7 @@ void CreateSocketInformation(SOCKET s)
 			}
 		}
 	}
-
 	// Prepare SocketInfo structure for use
-
-
 }
 
 LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
