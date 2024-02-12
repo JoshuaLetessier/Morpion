@@ -36,7 +36,6 @@ MorpionServer::MorpionServer()
 }
 
 
-
 void MorpionServer::handleEvent(int playerX, int playerY)
 {
     // case est valide et non occup�e

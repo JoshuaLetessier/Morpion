@@ -9,7 +9,6 @@ public:
 	enum class Player { None, CircleRed, CircleBalck };
 	std::vector<std::vector<Player>> board;
 	Player currentPlayer ;
-	//inline int __cdecl serve();
 	void handleEvent(int playerX, int playerY);
 	void draw();
 	bool checkGameOver() const;
