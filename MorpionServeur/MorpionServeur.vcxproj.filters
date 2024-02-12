@@ -29,9 +29,6 @@
     <ClInclude Include="MorpionServer.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Serve.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="Json.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>

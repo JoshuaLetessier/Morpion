@@ -1,4 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
+ï»¿#define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <windows.h>
@@ -203,7 +203,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				printf("Socket number  connected\n");
 
-				WSAAsyncSelect(Accept, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
+				WSAAsyncSelect(Accept, hwnd, WM_SOCKET, FD_READ | FD_CLOSE);
 
 				break;
 
@@ -213,6 +213,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				// Read data only if the receive buffer is empty
 
+				/*if (SocketInfo == NULL)
+				{
+					printf("SocketInfo Null");
+					return;
+				}*/
 				if (SocketInfo->BytesRECV != 0)
 				{
 					SocketInfo->RecvPosted = TRUE;
@@ -260,15 +265,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							data.resize(20);
 							sprintf_s(&data[0], data.size(), " %d", result);
 
-							// Envoie les données à l'autre socket
-							send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici à régler 
+							// Envoie les donnï¿½es ï¿½ l'autre socket
+							//send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici ï¿½ rï¿½gler 
 						}
 						else
 						{
 							char data[20];
 							sprintf_s(data, sizeof(data), " %d", result);
 
-							// Envoie les données à l'autre socket
+							// Envoie les donnï¿½es ï¿½ l'autre socket
 							//send(SocketInfo[2].Socket, data, (int)strlen(data), 0);
 						}
 
@@ -281,52 +286,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				// and begin writing data to the client
 
-			case FD_WRITE:
 
-				SocketInfo = GetSocketInformation(wParam);
-
-				if (SocketInfo->BytesRECV > SocketInfo->BytesSEND)
-				{
-					SocketInfo->DataBuf.buf = SocketInfo->Buffer + SocketInfo->BytesSEND;
-
-					SocketInfo->DataBuf.len = SocketInfo->BytesRECV - SocketInfo->BytesSEND;
-
-					if (WSASend(SocketInfo->Socket, &(SocketInfo->DataBuf), 1, &SendBytes, 0, NULL, NULL) == SOCKET_ERROR)
-					{
-						if (WSAGetLastError() != WSAEWOULDBLOCK)
-						{
-							printf("WSASend() failed with error %d\n", WSAGetLastError());
-							FreeSocketInformation(wParam);
-							return 0;
-						}
-					}
-
-					else // No error so update the byte count
-					{
-						printf("WSASend() is OK!\n");
-						SocketInfo->BytesSEND += SendBytes;
-					}
-				}
-
-				if (SocketInfo->BytesSEND == SocketInfo->BytesRECV)
-				{
-					SocketInfo->BytesSEND = 0;
-
-					SocketInfo->BytesRECV = 0;
-
-					// If a RECV occurred during our SENDs then we need to post an FD_READ notification on the socket
-
-					if (SocketInfo->RecvPosted == TRUE)
-					{
-						SocketInfo->RecvPosted = FALSE;
-						PostMessage(hwnd, WM_SOCKET, wParam, FD_READ);
-					}
-				}
-				break;
-			case FD_CLOSE:
+			/*case FD_CLOSE:
 				printf("Closing socket \n");
 				FreeSocketInformation(wParam);
-				break;
+				break;*/
 			}
 		}
 		return 0;
@@ -366,6 +330,8 @@ void CreateSocketInformation(SOCKET s)
 				SI->color = colorPlayer;
 
 				firstSocket = false;
+
+				break;
 			}
 			else
 			{
@@ -385,6 +351,8 @@ void CreateSocketInformation(SOCKET s)
 				SocketInfoList = SI;
 
 				SI->color = colorPlayer;
+
+				break;
 			}
 		}
 	}

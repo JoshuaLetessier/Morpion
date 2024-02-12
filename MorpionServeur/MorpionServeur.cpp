@@ -1,4 +1,4 @@
-﻿
+﻿#undef UNICODE
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -12,14 +12,17 @@
 #include <stdio.h>
 #include <fstream>
 
+//#include <nlohmann\json.hpp>
+//using json = nlohmann::json;
+
 #include "MorpionServer.hpp"
-#include "Json.hpp"
 #pragma comment (lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 #define ADRESS_IP "10.1.144.16"
 
+std::string newName = "Leo";
 const int gridSize = 3;
 const int cellSize = 100;
 static int iSendResult = 0;
@@ -32,138 +35,6 @@ MorpionServer::MorpionServer()
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
 
-inline int __cdecl MorpionServer::serve()
-{
-    WSADATA wsaData;
-    Json save;
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-    SOCKET ClientSocket = INVALID_SOCKET;
-
-    struct addrinfo* result = NULL;
-    struct addrinfo hints;
-
-    char recvbuf[DEFAULT_BUFLEN];
-    int recvbuflen = DEFAULT_BUFLEN;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
-        return 1;
-    }
-
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
-
-    // Resolve the server address and port
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        OutputDebugStringA("getaddrinfo failed with error: \n");
-        WSACleanup();
-        return 1;
-    }
-
-    // Create a SOCKET for the server to listen for client connections.
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("socket failed with error: %ld\n", WSAGetLastError());
-        OutputDebugStringA("socket failed with error: \n");
-        freeaddrinfo(result);
-        WSACleanup();
-        return 1;
-    }
-
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        OutputDebugStringA("bind failed with error: \n");
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    freeaddrinfo(result);
-
-    iResult = listen(ListenSocket, SOMAXCONN);
-    if (iResult == SOCKET_ERROR) {
-        printf("listen failed with error: %d\n", WSAGetLastError());
-        OutputDebugStringA("listen failed with error: \n");
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    // Accept a client socket
-    ClientSocket = accept(ListenSocket, NULL, NULL);
-    if (ClientSocket == INVALID_SOCKET) {
-        printf("accept failed with error: %d\n", WSAGetLastError());
-        OutputDebugStringA("accept failed with error: \n");
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-
-    // No longer need server socket
-    closesocket(ListenSocket);
-    //save.importTurnJson(true);
-
-    // Receive until the peer shuts down the connection
-    do {
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
-            OutputDebugStringA("reception \n");
-            printf("Bytes received: %d\n", iResult);
-            printf("Message received from client: %.*s\n", iResult, recvbuf);
-            //save.importMoveJson(recvbuf);
-
-            // Echo the buffer back to the sender
-            iSendResult = send(ClientSocket, recvbuf, iResult, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-                closesocket(ClientSocket);
-                WSACleanup();
-                return 1;
-            }
-            printf("Bytes sent: %d\n", iSendResult);
-
-        }
-        else if (iResult == 0) {
-            printf("Connection closing by client...\n");
-            break;  // Sortir de la boucle si le client ferme la connexion
-        }
-        else {
-
-            printf("recv failed with error: %d\n", WSAGetLastError());//client fermé avant
-            closesocket(ClientSocket);
-            WSACleanup();
-            return 1;
-        }
-
-    } while (iResult > 0);
-
-    // shutdown the connection since we're done
-    iResult = shutdown(ClientSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ClientSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    // cleanup
-    closesocket(ClientSocket);
-    WSACleanup();
-
-    return 0;
-}
 
 void MorpionServer::handleEvent(int playerX, int playerY)
 {
@@ -235,6 +106,22 @@ inline int MorpionServer::sendData(const char data[4096])
 
     return 0;
 }
+
+//void createJson()
+//{
+//    // Using user-defined (raw) string literals
+//    using namespace nlohmann::literals;
+//    json save_morpion = R"(
+//  { "name": "inconnu1", "victoire": false,  "date": 0 },
+//  { "name": "inconnu2", "victoire": false,  "date": 0 }
+//)"_json;
+//}
+
+void editJson(std::string newName, bool newVictory, std::time_t newDate)
+{
+
+}
+
 
 int __cdecl MorpionServer::main(void)
 {
