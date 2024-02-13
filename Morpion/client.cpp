@@ -79,19 +79,8 @@ inline int client()
         return 1;
     }
     
-    const char* data = "connexion";
-
-    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-    if (iResult == SOCKET_ERROR) {
-       // printf("send failed: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
-    }
-    else
-        printf("messagge send\n");
-
     recvData();
+
     return 0;
 }
 

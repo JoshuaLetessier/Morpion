@@ -129,7 +129,6 @@ std::string getPlayerName() {
 
 int main() {
 
-    
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     Morpion game;

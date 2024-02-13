@@ -32,19 +32,27 @@ static int iResult = 0;
 
 MorpionServer::MorpionServer()
 {
-    board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
+       board = std::vector<std::vector<int>>(gridSize, std::vector<int>(gridSize, 0));   
 }
-//modifie vercteru qui prennent juste des int;
+
 bool MorpionServer::handleEvent(int playerX, int playerY)
 {
     printf("handle cote serveur\n");
-    // case est valide et non occup�e
-    
-    //board[playerY][playerX] = 1;
-   //switchPlayer();
-  
-   return true;
+   
 
+    printf("%d \n", board[playerX][playerY]);
+    if (playerX >= 0 && playerX < gridSize && playerY >= 0 && playerY < gridSize && board[playerX][playerY] == 0)
+    {
+        board[playerX][playerY] = 1;
+        printf("%d \n", board[playerX][playerY]);
+        //switchPlayer();
+        return true;
+    } 
+    else
+    {
+        return false;
+    }
+    return false;
 }
 
 void MorpionServer::draw()
@@ -57,52 +65,44 @@ void MorpionServer::draw()
 }
 
 bool MorpionServer::checkGameOver() const {
-    // V�rifier les lignes et colonnes
-    for (int i = 0; i < gridSize; ++i) {
-        if (board[i][0] != Player::None &&
-            board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
-            return true;  // Victoire sur la ligne i
-        }
+    //// V�rifier les lignes et colonnes
+    //for (int i = 0; i < gridSize; ++i) {
+    //    if (board[i][0] != Player::None &&
+    //        board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+    //        return true;  // Victoire sur la ligne i
+    //    }
 
-        if (board[0][i] != Player::None &&
-            board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
-            return true;  // Victoire sur la colonne i
-        }
-    }
+    //    if (board[0][i] != Player::None &&
+    //        board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
+    //        return true;  // Victoire sur la colonne i
+    //    }
+    //}
 
-    // V�rifier les diagonales
-    if (board[0][0] != Player::None &&
-        board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
-        return true;  // Victoire sur la diagonale principale
-    }
+    //// V�rifier les diagonales
+    //if (board[0][0] != Player::None &&
+    //    board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+    //    return true;  // Victoire sur la diagonale principale
+    //}
 
-    if (board[0][2] != Player::None &&
-        board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
-        return true;  // Victoire sur l'autre diagonale
-    }
+    //if (board[0][2] != Player::None &&
+    //    board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+    //    return true;  // Victoire sur l'autre diagonale
+    //}
 
-    // V�rifier l'�galit�
-    for (int i = 0; i < gridSize; ++i) {
-        for (int j = 0; j < gridSize; ++j) {
-            if (board[i][j] == Player::None) {
-                return false;  // Il reste des cases vides, le jeu n'est pas �gal
-            }
-        }
-    }
+    //// V�rifier l'�galit�
+    //for (int i = 0; i < gridSize; ++i) {
+    //    for (int j = 0; j < gridSize; ++j) {
+    //        if (board[i][j] == Player::None) {
+    //            return false;  // Il reste des cases vides, le jeu n'est pas �gal
+    //        }
+    //    }
+    //}
 
     return true;  // Toutes les cases sont remplies, la partie est �gale
 }
 
 void MorpionServer::switchPlayer() {
-    currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
-}
-
-inline int MorpionServer::sendData(const char data[4096])
-{
-
-    /*iResult = send(ConnectSocket, data, (int)strlen(data), 0);*/
-
-    return 0;
+    //currentPlayer = (currentPlayer == Player::CircleRed) ? Player::CircleBalck : Player::CircleRed;
 }
 
 //void createJson()
@@ -120,11 +120,3 @@ void editJson(std::string newName, bool newVictory, std::time_t newDate)
 
 }
 
-int __cdecl MorpionServer::main(void)
-{
-    //MorpionServer game;
-    OutputDebugStringA("on lance le serv \n");
-    //game.serve();
-
-    return 0;
-}

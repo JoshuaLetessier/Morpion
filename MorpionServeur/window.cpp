@@ -45,8 +45,6 @@ typedef struct _SOCKET_INFORMATION {
 
 	const char* color;
 
-	MorpionServer Mserve;
-
 } SOCKET_INFORMATION, * LPSOCKET_INFORMATION;
 
 SOCKET_INFORMATION clientSockets[MAX_CLIENTS];
@@ -63,6 +61,8 @@ HWND MakeWorkerWindow(void);
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes);
+
 // Global var
 
 LPSOCKET_INFORMATION SocketInfoList;
@@ -73,8 +73,7 @@ bool firstSocket = true;
 int SocketNumber = 0;
 static int result = 0;
 
-
-
+MorpionServer Mserve;
 
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
 	MSG msg;
@@ -246,51 +245,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 					else // No error so update the byte count
 					{
-						printf("WSARecv() is OK!\n");
-
-						SocketInfo->DataBuf.buf[RecvBytes] = 0;
-						OutputDebugStringA(SocketInfo->DataBuf.buf);
-
-						SocketInfo->BytesRECV = RecvBytes;
-
-						if (RecvBytes > 0)
-						{
-							printf(" %.*s \n", RecvBytes, SocketInfo->DataBuf.buf);
-							const char* dataClient = SocketInfo->DataBuf.buf;
-							printf("%s\n", dataClient);
-
-							int posX = dataClient[0];
-							int posy = dataClient[2];
-							
-							if (SocketInfo->Mserve.handleEvent(posX,posy) && SocketNumber==1)
-							{
-								int iResult = send(SocketInfo->Socket, dataClient, (int)strlen(dataClient), 0);
-								if (iResult == SOCKET_ERROR) {
-									printf("send failed: %d\n", WSAGetLastError());
-									break; 
-								}else
-									printf("Sent %d bytes to server: %s\n", iResult, dataClient);
-								SocketInfo->BytesRECV = 0;
-								break;
-							}
-
-							//if( "black" == "black" && SocketNumber == 2) {
-							//	printf("renvoie possible");
-							//	
-							//	// Envoie les donn�es � l'autre socket
-							//	send(SocketInfo[0].Socket, SocketInfo->DataBuf.buf, SocketInfo->DataBuf.len, 0);//pb ici � r�gler
-							//	send(SocketInfo[1].Socket, SocketInfo->DataBuf.buf, SocketInfo->DataBuf.len, 0);
-							//}
-							//else if (SocketNumber == 2)
-							//{
-							//	std::string data;
-							//	data.resize(200);
-							//	sprintf_s(&data[0], data.size(), " %d", result);
-							//	// Envoie les donn�es � l'autre socket
-							//	send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);
-							//}
-						}
-						else if (RecvBytes == 0)
+						UpdateClient(SocketInfo, RecvBytes);
+						if (RecvBytes == 0)
 						{
 							printf("Socket deconnecté \n");
 						}
@@ -344,8 +300,7 @@ void CreateSocketInformation(SOCKET s)
 
 				SI->color = colorPlayer;
 
-				SI->Mserve.currentPlayer;
-
+				
 				firstSocket = false;
 				SocketNumber += 1;
 
@@ -467,4 +422,62 @@ HWND MakeWorkerWindow(void)
 	//ShowWindow(Window, SW_SHOW);
 	return Window;
 
+}
+
+void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
+{
+	printf("WSARecv() is OK!\n");
+
+	SocketInfo->DataBuf.buf[RecvBytes] = 0;
+	OutputDebugStringA(SocketInfo->DataBuf.buf);
+
+	SocketInfo->BytesRECV = RecvBytes;
+
+	if (RecvBytes > 0)
+	{
+		//printf(" %.*s \n", RecvBytes, SocketInfo->DataBuf.buf);
+		std::string dataClient = SocketInfo->DataBuf.buf;
+		//printf("%s\n", dataClient);
+
+		int posX = std::stoi(dataClient.substr(0, 1));
+		int posY = std::stoi(dataClient.substr(2, 1));
+		printf("%d\n", posX);
+		if (Mserve.handleEvent(posX, posY) == true)
+		{
+			/*for (LPSOCKET_INFORMATION currentClient = SocketInfoList; currentClient != NULL; currentClient = currentClient->Next)
+			{*/
+				if (SocketInfo->color == "black" && SocketNumber == 1)
+				{
+					dataClient += " black";
+					int iResult = send(SocketInfo->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					if (iResult == SOCKET_ERROR) {
+						printf("send failed: %d\n", WSAGetLastError());
+					}
+					else
+						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
+					SocketInfo->BytesRECV = 0;
+				}
+				else if (SocketInfo->color == "red" && SocketNumber == 1)
+				{
+					dataClient += " red";
+					int iResult = send(SocketInfo->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					if (iResult == SOCKET_ERROR) {
+						printf("send failed: %d\n", WSAGetLastError());
+					}
+					else
+						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
+					SocketInfo->BytesRECV = 0;
+				}
+			//}
+			
+		}
+		else
+		{
+			const char* erreur = "rejouer";
+			int iResult = send(SocketInfo->Socket, erreur, (int)strlen(erreur),0);
+			printf("erreur au moment d'un clic client \n");
+			return;
+		}
+	}
+	return;
 }
