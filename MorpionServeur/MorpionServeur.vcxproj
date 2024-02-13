@@ -145,6 +145,7 @@
     <ClInclude Include="Json.hpp" />
     <ClInclude Include="MorpionServer.hpp" />
     <ClInclude Include="Threading.h" />
+    <ClInclude Include="window.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

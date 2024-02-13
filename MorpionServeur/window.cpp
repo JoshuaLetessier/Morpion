@@ -11,6 +11,7 @@
 
 #include "MorpionServer.hpp"
 #include "Threading.hpp"
+#include "window.hpp"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -24,6 +25,40 @@
 #define MAX_CLIENTS 2
 
 // typedef definition
+
+
+MyWindow::MyWindow() : Listen(INVALID_SOCKET), Window(NULL) {}
+
+MyWindow::~MyWindow() {
+	WSACleanup();
+}
+
+
+void MyWindow::StartServer() {
+	Initialize();
+
+	// Boucle de messages de fenêtre
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
+
+void MyWindow::Initialize() {
+	WSADATA wsaData;
+	if (WSAStartup((2, 2), &wsaData) != 0) {
+		printf("WSAStartup() a échoué avec l'erreur %d\n", WSAGetLastError());
+		return;
+	}
+
+	// Initialiser la fenêtre
+	Window = MakeWorkerWindow();
+	if (Window == NULL) {
+		printf("MakeWorkerWindow() a échoué !\n");
+		return;
+	}
+}
 
 typedef struct _SOCKET_INFORMATION 
 {
@@ -39,12 +74,6 @@ typedef struct _SOCKET_INFORMATION
 
 SOCKET_INFORMATION clientSockets[MAX_CLIENTS];
 
-// Prototypes
-void CreateSocketInformation(SOCKET s);
-LPSOCKET_INFORMATION GetSocketInformation(SOCKET s);
-void FreeSocketInformation(SOCKET s);
-HWND MakeWorkerWindow(void);
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // Global var
 LPSOCKET_INFORMATION SocketInfoList;
@@ -131,7 +160,7 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	}
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	SOCKET Accept;
 	LPSOCKET_INFORMATION SocketInfo;
@@ -240,7 +269,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-void CreateSocketInformation(SOCKET s)
+void MyWindow::CreateSocketInformation(SOCKET s)
 {
 	LPSOCKET_INFORMATION SI;
 	for (int i = 0; i < MAX_CLIENTS; ++i) {
@@ -283,7 +312,7 @@ void CreateSocketInformation(SOCKET s)
 	// Prepare SocketInfo structure for use
 }
 
-LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
+LPSOCKET_INFORMATION MyWindow::GetSocketInformation(SOCKET s)
 {
 	SOCKET_INFORMATION* SI = SocketInfoList;
 	while (SI)
@@ -296,7 +325,7 @@ LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 	return NULL;
 }
 
-void FreeSocketInformation(SOCKET s)
+void MyWindow::FreeSocketInformation(SOCKET s)
 {
 	SOCKET_INFORMATION* SI = SocketInfoList;
 	SOCKET_INFORMATION* PrevSI = NULL;
@@ -319,7 +348,7 @@ void FreeSocketInformation(SOCKET s)
 	}
 }
 
-HWND MakeWorkerWindow(void)
+HWND MyWindow::MakeWorkerWindow(void)
 {
 	WNDCLASS wndclass;
 	const CHAR* ProviderClass = "AsyncSelect";
