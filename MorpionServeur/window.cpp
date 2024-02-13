@@ -10,7 +10,7 @@
 #include <string>
 
 #include "MorpionServer.hpp"
-#include "Threading.h"
+#include "Threading.hpp"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
