@@ -268,7 +268,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 								if (iResult == SOCKET_ERROR) {
 									printf("send failed: %d\n", WSAGetLastError());
 									break; 
-								}
+								}else
+									printf("Sent %d bytes to server: %s\n", iResult, dataClient);
 								SocketInfo->BytesRECV = 0;
 								break;
 							}

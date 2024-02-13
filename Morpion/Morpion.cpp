@@ -15,7 +15,7 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
 
-void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
+bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
@@ -29,8 +29,10 @@ void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
         const char* data = dataConvert.c_str();
         printf("event detecte \n");
         sendData(data);
+
+        return true;
     }
-    return;
+    return false;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
@@ -127,26 +129,24 @@ std::string getPlayerName() {
 
 int main() {
 
-    client();
+    
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     Morpion game;
-
+    client();
     while (window.isOpen()) {
-        
+       
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
                 killClient();
             }
-
-            game.handleEvent(event, window);
-            //recvData();
+            if(game.handleEvent(event, window))
+                recvData();
         }
-       
         game.draw(window);
-
+        
     }
     return 0;
 }
