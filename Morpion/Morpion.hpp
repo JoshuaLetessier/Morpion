@@ -8,7 +8,7 @@ public:
 	std::vector<std::vector<Player>> board;
 	Player currentPlayer;
 
-	bool handleEvent(sf::Event& event, sf::RenderWindow& window);
+	void handleEvent(sf::Event& event, sf::RenderWindow& window);
 	void draw(sf::RenderWindow& window);
 	void drawCircleR(sf::RenderWindow& window, float x, float y);
 	void drawCircle(sf::RenderWindow& window, float x, float y);

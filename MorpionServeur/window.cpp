@@ -65,7 +65,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LPSOCKET_INFORMATION SocketInfoList;
 
 char recvbuf[DEFAULT_BUFLEN];
+int recvbuflen = DEFAULT_BUFLEN;
 bool firstSocket = true;
+static int result = 0;
 
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
 	MSG msg;
@@ -74,6 +76,7 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	SOCKADDR_IN InternetAddr;
 	HWND Window;
 	WSADATA wsaData;
+
 
 	MorpionServer Mserve;
 	Mserve.main();
@@ -105,7 +108,7 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	else
 		printf("socket() is pretty fine!\n");
 
-	if (WSAAsyncSelect(Listen, Window, WM_SOCKET, FD_ACCEPT | FD_CLOSE) == 0)
+	if (WSAAsyncSelect(Listen, Window, WM_SOCKET, FD_ACCEPT | FD_READ | FD_CLOSE) == 0)
 		printf("WSAAsyncSelect() is OK lol!\n");
 	else
 		printf("WSAAsyncSelect() failed with error code %d\n", WSAGetLastError());
@@ -144,6 +147,7 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 		else
 		{
 			//printf("\nGetMessage() is pretty fine!\n");
+
 		}
 
 		//printf("Translating a message...\n");
@@ -171,13 +175,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			printf("Socket failed with error %d\n", WSAGETSELECTERROR(lParam));
 			FreeSocketInformation(wParam);
 		}
-
 		else
-
 		{
-
 			printf("Socket looks fine!\n");
-
 			switch (WSAGETSELECTEVENT(lParam))
 			{
 
@@ -202,7 +202,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				CreateSocketInformation(Accept);
 
-				printf("Socket number  connected\n");
+				printf("Socket number %d connected\n", Accept);
 
 				WSAAsyncSelect(Accept, hwnd, WM_SOCKET, FD_READ | FD_CLOSE);
 
@@ -211,16 +211,21 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case FD_READ:
 
 				SocketInfo = GetSocketInformation(wParam);
-
 				// Read data only if the receive buffer is empty
+
+				printf("Socket Information:\n");
+				printf("  Socket: %d\n", SocketInfo[0].Socket);
+				printf("  Socket: %d\n", SocketInfo->Socket);
+				printf("  RecvPosted: %s\n", SocketInfo->RecvPosted ? "TRUE" : "FALSE");
+				printf("  BytesSEND: %d\n", SocketInfo->BytesSEND);
+				printf("  BytesRECV: %d\n", SocketInfo->BytesRECV);
+				printf("  Color: %s\n", SocketInfo->color);
 				
-				if (SocketInfo->BytesRECV != 0)
+				if(SocketInfo->BytesRECV != 0)
 				{
 					SocketInfo->RecvPosted = TRUE;
-
 					return 0;
 				}
-
 				else
 				{
 					SocketInfo->DataBuf.buf = SocketInfo->Buffer;
@@ -232,57 +237,59 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						if (WSAGetLastError() != WSAEWOULDBLOCK)
 						{
 							printf("WSARecv() failed with error %d\n", WSAGetLastError());
-
 							FreeSocketInformation(wParam);
-
 							return 0;
-
 						}
 
 					}
 
 					else // No error so update the byte count
 					{
-
 						printf("WSARecv() is OK!\n");
-						SocketInfo->DataBuf.buf[RecvBytes] = 0;
+
+						/*SocketInfo->DataBuf.buf[RecvBytes] = 0;
 						OutputDebugStringA(SocketInfo->DataBuf.buf);
 
-						SocketInfo->BytesRECV = RecvBytes;
-
-						int result = recv(SocketInfo->Socket, recvbuf, (int)strlen(recvbuf), 0);
-						if (result > 0)
-						{
-							printf("%.*s\n", result, recvbuf);
+						SocketInfo->BytesRECV = RecvBytes;*/
+						
+						result = recv(SocketInfo->Socket, recvbuf, recvbuflen, 0);
+						if (result > 0) {
+							printf("Message received from server: %.*s\n", result, recvbuf);
+							// Traitement des données reçues
 						}
-
-						if (strcmp(SocketInfo[0].color, "black") == 0) {
-							std::string data;
-							data.resize(20);
-							sprintf_s(&data[0], data.size(), " %d", result);
-
-							// Envoie les donn�es � l'autre socket
-							//send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici � r�gler 
+						else if (result == 0) {
+							// La connexion a été fermée par le client
+							printf("Connection closed by the client.\n");
+							FreeSocketInformation(SocketInfo->Socket);
 						}
-						else
-						{
-							char data[20];
-							sprintf_s(data, sizeof(data), " %d", result);
-
-							// Envoie les donn�es � l'autre socket
-							//send(SocketInfo[2].Socket, data, (int)strlen(data), 0);
+						else {
+							// Une erreur s'est produite lors de la réception
+							printf("recv() failed with error %d\n", WSAGetLastError());
+							printf("result %d\n", result);
+							FreeSocketInformation(SocketInfo->Socket);	
+							
 						}
-
-
+							//if (strcmp(SocketInfo[0].color, "black") == 0 && firstSocket) {
+							//	std::string data;
+							//	data.resize(200);
+							//	sprintf_s(&data[0], data.size(), " %d", result);
+							//	// Envoie les donn�es � l'autre socket
+							//	send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici � r�gler 
+							//}
+							//else if (firstSocket)
+							//{
+							//	std::string data;
+							//	data.resize(200);
+							//	sprintf_s(&data[0], data.size(), " %d", result);
+							//	// Envoie les donn�es � l'autre socket
+							//	send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);
+							//}
 					}
-
 				}
 				break;
 				// DO NOT BREAK HERE SINCE WE GOT A SUCCESSFUL RECV. Go ahead
-
 				// and begin writing data to the client
 
-			
 			case FD_CLOSE:
 				printf("Closing socket \n");
 				FreeSocketInformation(wParam);
@@ -327,6 +334,13 @@ void CreateSocketInformation(SOCKET s)
 
 				firstSocket = false;
 
+				printf("Socket Information1:\n");
+				printf("  Socket: %d\n", SI->Socket);
+				printf("  RecvPosted: %s\n", SI->RecvPosted ? "TRUE" : "FALSE");
+				printf("  BytesSEND: %d\n", SI->BytesSEND);
+				printf("  BytesRECV: %d\n", SI->BytesRECV);
+				printf("  Color: %s\n", SI->color);
+
 				break;
 			}
 			else
@@ -353,9 +367,6 @@ void CreateSocketInformation(SOCKET s)
 		}
 	}
 
-	// Prepare SocketInfo structure for use
-
-
 }
 
 LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
@@ -365,9 +376,9 @@ LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 	while (SI)
 	{
 		if (SI->Socket == s)
-
+		{
 			return SI;
-
+		}
 		SI = SI->Next;
 	}
 	return NULL;

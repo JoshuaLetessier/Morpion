@@ -12,6 +12,7 @@
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
+inline int sendData(const char data[4096]);
 
 
 inline int client()
@@ -66,7 +67,6 @@ inline int client()
         printf("Error for socket server : %ld\n", WSAGetLastError());
         closesocket(ConnectSocket);
         ConnectSocket = INVALID_SOCKET;
-        //continue;
     }
 
     freeaddrinfo(result);
@@ -79,8 +79,9 @@ inline int client()
         WSACleanup();
         return 1;
     }
+    
+    const char* data = "connexionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn";
 
-    const char* data = "connexion";
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
@@ -88,8 +89,8 @@ inline int client()
         WSACleanup();
         return 1;
     }
-
-    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
+    else
+        printf("messagge send\n");
 
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if (iResult > 0) {
@@ -122,19 +123,25 @@ inline int killClient()
 inline int sendData(const char data[4096])
 {
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
-    OutputDebugStringA("fonction envoie \n");
-
-    return 0;
-}
-
-inline int recvData()
-{
-    char recvbuf[DEFAULT_BUFLEN];
-    int recvbuflen = DEFAULT_BUFLEN;
-    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-    if (iResult > 0) {
-        printf("Message received from server: %.*s\n", iResult, recvbuf);
-
+    if (iResult == SOCKET_ERROR) {
+        printf("send failed: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
     }
-    return 0;
+
+   
 }
+
+
+//inline int recvData()
+//{
+//    char recvbuf[DEFAULT_BUFLEN];
+//    int recvbuflen = DEFAULT_BUFLEN;
+//    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+//    if (iResult > 0) {
+//        printf("Message received from server: %.*s\n", iResult, recvbuf);
+//
+//    }
+//    return 0;
+//}

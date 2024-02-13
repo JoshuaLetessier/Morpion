@@ -7,7 +7,7 @@
 const int gridSize = 3;
 const int cellSize = 100;
 
-inline int client(char* callback);
+inline int client();
 inline int killClient();
 
 Morpion::Morpion() : currentPlayer(Player::CircleRed) {
@@ -15,7 +15,7 @@ Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
 
-bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
+void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
@@ -30,9 +30,9 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
         OutputDebugStringA("event detecte \n");
         sendData(data);
 
-        return true;
+       
     }
-    return false;
+    return;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
@@ -142,8 +142,8 @@ int main() {
                 killClient();
             }
 
-            if (game.handleEvent(event, window))
-                recvData();
+            game.handleEvent(event, window);
+                
         }
 
         game.draw(window);

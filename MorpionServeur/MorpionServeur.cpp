@@ -35,7 +35,6 @@ MorpionServer::MorpionServer()
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
 
-
 void MorpionServer::handleEvent(int playerX, int playerY)
 {
     // case est valide et non occup�e
@@ -121,7 +120,6 @@ void editJson(std::string newName, bool newVictory, std::time_t newDate)
 {
 
 }
-
 
 int __cdecl MorpionServer::main(void)
 {
