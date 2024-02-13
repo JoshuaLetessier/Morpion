@@ -10,9 +10,11 @@ const int cellSize = 100;
 inline int client();
 inline int killClient();
 
-Morpion::Morpion() : currentPlayer(Player::CircleRed) {
+Morpion::Morpion() 
+{
     // Initialiser la grille avec des valeurs par défaut
-    board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
+    board = std::vector<std::vector<int>>(gridSize, std::vector<int>(gridSize, 0));
+    currentPlayer = 1;
 }
 
 bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
@@ -21,7 +23,7 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
         int mouseY = event.mouseButton.y / cellSize;
 
         if (mouseX >= 0 && mouseX < gridSize && mouseY >= 0 && mouseY < gridSize &&
-            board[mouseY][mouseX] == Player::None) {
+            board[mouseY][mouseX] == 0) {
             board[mouseY][mouseX] = currentPlayer;
         }
 
@@ -33,6 +35,19 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
         return true;
     }
     return false;
+}
+
+void Morpion::swapPlayer()
+{
+    if (currentPlayer == 1)
+        currentPlayer = 2;
+    else
+        currentPlayer = 1;
+}
+
+void Morpion::setTileVal(int targetX, int targetY, int value)
+{
+    board[targetX][targetY] = value;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
@@ -47,11 +62,14 @@ void Morpion::draw(sf::RenderWindow& window) {
             cell.setOutlineColor(sf::Color::Black);
             window.draw(cell);
 
-            // Dessiner X ou O
-            if (board[i][j] == Player::CircleRed) {
+            // Le joueur ROUGE place un pion
+            if (board[i][j] == 1)
+            {
                 drawCircleR(window, j * cellSize, i * cellSize);
             }
-            else if (board[i][j] == Player::CircleBalck) {
+            // Le joueur NOIR place un pion
+            else if (board[i][j] == 2)
+            {
                 drawCircle(window, j * cellSize, i * cellSize);
             }
         }
@@ -142,8 +160,15 @@ int main() {
                 window.close();
                 killClient();
             }
-            if(game.handleEvent(event, window))
-                recvData();
+            if (game.handleEvent(event, window))
+            {
+                char* data = recvData();
+                int newPosX = (int)data[0]-48;
+                int newPosY = (int)data[2]-48;
+                printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);
+
+                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+            }
         }
         game.draw(window);
         
