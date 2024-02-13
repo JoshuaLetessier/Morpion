@@ -28,7 +28,6 @@ inline int client()
 
     ZeroMemory(&hints, sizeof(hints));
 
-
     // Initialize Winsock 
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
@@ -80,7 +79,7 @@ inline int client()
         return 1;
     }
     
-    const char* data = "connexionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn";
+    const char* data = "connexion";
 
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
     if (iResult == SOCKET_ERROR) {

@@ -10,6 +10,7 @@
 #include <string>
 
 #include "MorpionServer.hpp"
+#include <iostream>
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -197,7 +198,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					printf("accept() is OK!\n");
 				}
-
+				
 				// Create a socket information structure to associate with the socket for processing I/O
 
 				CreateSocketInformation(Accept);
@@ -240,35 +241,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							FreeSocketInformation(wParam);
 							return 0;
 						}
-
+						
 					}
-
 					else // No error so update the byte count
 					{
 						printf("WSARecv() is OK!\n");
 
-						/*SocketInfo->DataBuf.buf[RecvBytes] = 0;
+						SocketInfo->DataBuf.buf[RecvBytes] = 0;
 						OutputDebugStringA(SocketInfo->DataBuf.buf);
 
-						SocketInfo->BytesRECV = RecvBytes;*/
+						SocketInfo->BytesRECV = RecvBytes;
+
+						printf(" %.*s \n", RecvBytes, SocketInfo->DataBuf.buf);
 						
-						result = recv(SocketInfo->Socket, recvbuf, recvbuflen, 0);
-						if (result > 0) {
-							printf("Message received from server: %.*s\n", result, recvbuf);
-							// Traitement des données reçues
-						}
-						else if (result == 0) {
-							// La connexion a été fermée par le client
-							printf("Connection closed by the client.\n");
-							FreeSocketInformation(SocketInfo->Socket);
-						}
-						else {
-							// Une erreur s'est produite lors de la réception
-							printf("recv() failed with error %d\n", WSAGetLastError());
-							printf("result %d\n", result);
-							FreeSocketInformation(SocketInfo->Socket);	
-							
-						}
 							//if (strcmp(SocketInfo[0].color, "black") == 0 && firstSocket) {
 							//	std::string data;
 							//	data.resize(200);
