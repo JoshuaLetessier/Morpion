@@ -9,9 +9,7 @@
 #include <conio.h>
 #include <string>
 
-#include "MorpionServer.hpp"
-#include "Threading.hpp"
-#include "window.hpp"
+
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -23,6 +21,10 @@
 #define DEFAULT_BUFLEN 512
 #define WM_SOCKET (WM_USER + 1)
 #define MAX_CLIENTS 2
+
+#include "MorpionServer.hpp"
+#include "Threading.hpp"
+#include "window.hpp"
 
 // typedef definition
 
@@ -80,85 +82,7 @@ LPSOCKET_INFORMATION SocketInfoList;
 
 char recvbuf[DEFAULT_BUFLEN];
 bool firstSocket = true;
-
-int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
-	MSG msg;
-	DWORD Ret;
-	SOCKET Listen;
-	SOCKADDR_IN InternetAddr;
-	HWND Window;
-	WSADATA wsaData;
-	MorpionServer Mserve;
-
-	if ((Window = MakeWorkerWindow()) == NULL)
-	{
-		printf("MakeWorkerWindow() failed!\n");
-		return 1;
-	}
-	else
-		printf("MakeWorkerWindow() is OK!\n");
-
-	// Prepare echo server
-	if (WSAStartup((2, 2), &wsaData) != 0)
-	{
-		printf("WSAStartup() failed with error %d\n", WSAGetLastError());
-		return 1;
-	}
-	else
-		printf("WSAStartup() is OK!\n");
-
-	if ((Listen = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
-	{
-		printf("socket() failed with error %d\n", WSAGetLastError());
-		return 1;
-	}
-	else
-		printf("socket() is pretty fine!\n");
-
-	if (WSAAsyncSelect(Listen, Window, WM_SOCKET, FD_ACCEPT | FD_CLOSE) == 0)
-		printf("WSAAsyncSelect() is OK lol!\n");
-	else
-		printf("WSAAsyncSelect() failed with error code %d\n", WSAGetLastError());
-
-	InternetAddr.sin_family = AF_INET;
-	InternetAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	InternetAddr.sin_port = htons(PORT);
-
-	if (bind(Listen, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
-	{
-		printf("bind() failed with error %d\n", WSAGetLastError());
-		return 1;
-	}
-	else
-		printf("bind() is OK maaa!\n");
-
-	if (listen(Listen, 5))
-	{
-		printf("listen() failed with error %d\n", WSAGetLastError());
-		return 1;
-	}
-	else
-		printf("listen() is also OK! I am listening now...\n");
-
-	// Translate and dispatch window messages for the application thread
-
-	while (Ret = GetMessage(&msg, NULL, 0, 0))
-	{
-		if (Ret == -1)
-		{
-			//printf("\nGetMessage() failed with error %d\n", GetLastError());
-			return 1;
-		}
-		else
-		{
-			//printf("\nGetMessage() is pretty fine!\n");
-		}
-		//printf("Translating a message...\n");
-		TranslateMessage(&msg);
-		//printf("Dispatching a message...\n");
-		DispatchMessage(&msg);
-	}
-}
+LPSOCKET_INFORMATION GetSocketInformation(SOCKET s);
 
 LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -312,7 +236,7 @@ void MyWindow::CreateSocketInformation(SOCKET s)
 	// Prepare SocketInfo structure for use
 }
 
-LPSOCKET_INFORMATION MyWindow::GetSocketInformation(SOCKET s)
+LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 {
 	SOCKET_INFORMATION* SI = SocketInfoList;
 	while (SI)
@@ -384,4 +308,83 @@ HWND MyWindow::MakeWorkerWindow(void)
 	//ShowWindow(Window, SW_SHOW);
 	return Window;
 
+}
+
+int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
+	MSG msg;
+	DWORD Ret;
+	SOCKET Listen;
+	SOCKADDR_IN InternetAddr;
+	HWND Window;
+	WSADATA wsaData;
+	MorpionServer Mserve;
+
+	if ((Window = MyWindow::MakeWorkerWindow()) == NULL)
+	{
+		printf("MakeWorkerWindow() failed!\n");
+		return 1;
+	}
+	else
+		printf("MakeWorkerWindow() is OK!\n");
+
+	// Prepare echo server
+	if (WSAStartup((2, 2), &wsaData) != 0)
+	{
+		printf("WSAStartup() failed with error %d\n", WSAGetLastError());
+		return 1;
+	}
+	else
+		printf("WSAStartup() is OK!\n");
+
+	if ((Listen = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+	{
+		printf("socket() failed with error %d\n", WSAGetLastError());
+		return 1;
+	}
+	else
+		printf("socket() is pretty fine!\n");
+
+	if (WSAAsyncSelect(Listen, Window, WM_SOCKET, FD_ACCEPT | FD_CLOSE) == 0)
+		printf("WSAAsyncSelect() is OK lol!\n");
+	else
+		printf("WSAAsyncSelect() failed with error code %d\n", WSAGetLastError());
+
+	InternetAddr.sin_family = AF_INET;
+	InternetAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	InternetAddr.sin_port = htons(PORT);
+
+	if (bind(Listen, (PSOCKADDR)&InternetAddr, sizeof(InternetAddr)) == SOCKET_ERROR)
+	{
+		printf("bind() failed with error %d\n", WSAGetLastError());
+		return 1;
+	}
+	else
+		printf("bind() is OK maaa!\n");
+
+	if (listen(Listen, 5))
+	{
+		printf("listen() failed with error %d\n", WSAGetLastError());
+		return 1;
+	}
+	else
+		printf("listen() is also OK! I am listening now...\n");
+
+	// Translate and dispatch window messages for the application thread
+
+	while (Ret = GetMessage(&msg, NULL, 0, 0))
+	{
+		if (Ret == -1)
+		{
+			//printf("\nGetMessage() failed with error %d\n", GetLastError());
+			return 1;
+		}
+		else
+		{
+			//printf("\nGetMessage() is pretty fine!\n");
+		}
+		//printf("Translating a message...\n");
+		TranslateMessage(&msg);
+		//printf("Dispatching a message...\n");
+		DispatchMessage(&msg);
+	}
 }

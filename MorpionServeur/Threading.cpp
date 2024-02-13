@@ -59,7 +59,7 @@ DWORD WINAPI Threading::Thread_no_1(LPVOID lpParam)
 
     for (count = 0; count <= 4; count++)
     {
-        DisplayMessage(hStdout, "Thread_no_1", Data, count);
+        //DisplayMessage(hStdout, "Thread_no_1", Data, count);
     }
 
     return 0;
@@ -87,7 +87,7 @@ DWORD WINAPI Threading::Thread_no_2(LPVOID lpParam)
 
     for (count = 0; count <= 7; count++)
     {
-        DisplayMessage(hStdout, "Thread_no_2", Data, count);
+        //DisplayMessage(hStdout, "Thread_no_2", Data, count);
     }
 
     return 0;
