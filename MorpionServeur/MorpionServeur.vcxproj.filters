@@ -35,7 +35,7 @@
     <ClInclude Include="Json.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Threading.h">
+    <ClInclude Include="Threading.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
