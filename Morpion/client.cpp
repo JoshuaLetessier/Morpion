@@ -13,7 +13,7 @@ static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
 inline int sendData(const char data[4096]);
-
+inline int recvData();
 
 inline int client()
 {
@@ -90,8 +90,8 @@ inline int client()
     }
     else
         printf("messagge send\n");
-
-    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    recvData();
+    /*iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if (iResult > 0) {
         printf("Message received from server: %.*s\n", iResult, recvbuf);
 
@@ -102,7 +102,7 @@ inline int client()
     }
     else {
         printf("recv failed with error: %d\n", WSAGetLastError());
-    }
+    }*/
     return 0;
 }
 
@@ -128,19 +128,16 @@ inline int sendData(const char data[4096])
         WSACleanup();
         return 1;
     }
-
-   
 }
 
+inline int recvData()
+{
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    if (iResult > 0) {
+        printf("Message received from server: %.*s\n", iResult, recvbuf);
 
-//inline int recvData()
-//{
-//    char recvbuf[DEFAULT_BUFLEN];
-//    int recvbuflen = DEFAULT_BUFLEN;
-//    iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-//    if (iResult > 0) {
-//        printf("Message received from server: %.*s\n", iResult, recvbuf);
-//
-//    }
-//    return 0;
-//}
+    }
+    return 0;
+}

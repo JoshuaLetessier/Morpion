@@ -45,6 +45,8 @@ typedef struct _SOCKET_INFORMATION {
 
 	const char* color;
 
+	MorpionServer Mserve;
+
 } SOCKET_INFORMATION, * LPSOCKET_INFORMATION;
 
 SOCKET_INFORMATION clientSockets[MAX_CLIENTS];
@@ -68,7 +70,11 @@ LPSOCKET_INFORMATION SocketInfoList;
 char recvbuf[DEFAULT_BUFLEN];
 int recvbuflen = DEFAULT_BUFLEN;
 bool firstSocket = true;
+int SocketNumber = 0;
 static int result = 0;
+
+
+
 
 int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
 	MSG msg;
@@ -77,11 +83,6 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	SOCKADDR_IN InternetAddr;
 	HWND Window;
 	WSADATA wsaData;
-
-
-	MorpionServer Mserve;
-	Mserve.main();
-
 
 	if ((Window = MakeWorkerWindow()) == NULL)
 	{
@@ -214,13 +215,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SocketInfo = GetSocketInformation(wParam);
 				// Read data only if the receive buffer is empty
 
-				printf("Socket Information:\n");
+				/*printf("Socket Information:\n");
 				printf("  Socket: %d\n", SocketInfo[0].Socket);
 				printf("  Socket: %d\n", SocketInfo->Socket);
 				printf("  RecvPosted: %s\n", SocketInfo->RecvPosted ? "TRUE" : "FALSE");
 				printf("  BytesSEND: %d\n", SocketInfo->BytesSEND);
 				printf("  BytesRECV: %d\n", SocketInfo->BytesRECV);
-				printf("  Color: %s\n", SocketInfo->color);
+				printf("  Color: %s\n", SocketInfo->color);*/
 				
 				if(SocketInfo->BytesRECV != 0)
 				{
@@ -252,16 +253,34 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						SocketInfo->BytesRECV = RecvBytes;
 
-						printf(" %.*s \n", RecvBytes, SocketInfo->DataBuf.buf);
-						
-							//if (strcmp(SocketInfo[0].color, "black") == 0 && firstSocket) {
-							//	std::string data;
-							//	data.resize(200);
-							//	sprintf_s(&data[0], data.size(), " %d", result);
+						if (RecvBytes > 0)
+						{
+							printf(" %.*s \n", RecvBytes, SocketInfo->DataBuf.buf);
+							const char* dataClient = SocketInfo->DataBuf.buf;
+							printf("%s\n", dataClient);
+
+							int posX = dataClient[0];
+							int posy = dataClient[2];
+							
+							if (SocketInfo->Mserve.handleEvent(posX,posy) && SocketNumber==1)
+							{
+								int iResult = send(SocketInfo->Socket, dataClient, (int)strlen(dataClient), 0);
+								if (iResult == SOCKET_ERROR) {
+									printf("send failed: %d\n", WSAGetLastError());
+									break; 
+								}
+								SocketInfo->BytesRECV = 0;
+								break;
+							}
+
+							//if( "black" == "black" && SocketNumber == 2) {
+							//	printf("renvoie possible");
+							//	
 							//	// Envoie les donn�es � l'autre socket
-							//	send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici � r�gler 
+							//	send(SocketInfo[0].Socket, SocketInfo->DataBuf.buf, SocketInfo->DataBuf.len, 0);//pb ici � r�gler
+							//	send(SocketInfo[1].Socket, SocketInfo->DataBuf.buf, SocketInfo->DataBuf.len, 0);
 							//}
-							//else if (firstSocket)
+							//else if (SocketNumber == 2)
 							//{
 							//	std::string data;
 							//	data.resize(200);
@@ -269,6 +288,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							//	// Envoie les donn�es � l'autre socket
 							//	send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);
 							//}
+						}
+						else if (RecvBytes == 0)
+						{
+							printf("Socket deconnecté \n");
+						}
+						SocketInfo->BytesRECV = 0;
 					}
 				}
 				break;
@@ -276,6 +301,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// and begin writing data to the client
 
 			case FD_CLOSE:
+				SocketNumber -= 1;
 				printf("Closing socket \n");
 				FreeSocketInformation(wParam);
 				break;
@@ -317,14 +343,17 @@ void CreateSocketInformation(SOCKET s)
 
 				SI->color = colorPlayer;
 
-				firstSocket = false;
+				SI->Mserve.currentPlayer;
 
-				printf("Socket Information1:\n");
-				printf("  Socket: %d\n", SI->Socket);
-				printf("  RecvPosted: %s\n", SI->RecvPosted ? "TRUE" : "FALSE");
-				printf("  BytesSEND: %d\n", SI->BytesSEND);
-				printf("  BytesRECV: %d\n", SI->BytesRECV);
-				printf("  Color: %s\n", SI->color);
+				firstSocket = false;
+				SocketNumber += 1;
+
+				//printf("Socket Information1:\n");
+				//printf("  Socket: %d\n", SI->Socket);
+				//printf("  RecvPosted: %s\n", SI->RecvPosted ? "TRUE" : "FALSE");
+				//printf("  BytesSEND: %d\n", SI->BytesSEND);
+				//printf("  BytesRECV: %d\n", SI->BytesRECV);
+				//printf("  Color: %s\n", SI->color);
 
 				break;
 			}
@@ -346,6 +375,8 @@ void CreateSocketInformation(SOCKET s)
 				SocketInfoList = SI;
 
 				SI->color = colorPlayer;
+
+				SocketNumber += 1;
 
 				break;
 			}

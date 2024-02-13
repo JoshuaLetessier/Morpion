@@ -27,25 +27,24 @@ const int gridSize = 3;
 const int cellSize = 100;
 static int iSendResult = 0;
 static int iResult = 0;
-static SOCKET ConnectSocket = INVALID_SOCKET;
+//static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
 MorpionServer::MorpionServer()
 {
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
 }
-
-void MorpionServer::handleEvent(int playerX, int playerY)
+//modifie vercteru qui prennent juste des int;
+bool MorpionServer::handleEvent(int playerX, int playerY)
 {
+    printf("handle cote serveur\n");
     // case est valide et non occup�e
-    if (playerX >= 0 && playerX < gridSize && playerY >= 0 && playerY < gridSize && board[playerY][playerX] == Player::None) {
-        board[playerY][playerX] = currentPlayer;
-        switchPlayer();
+    
+    //board[playerY][playerX] = 1;
+   //switchPlayer();
+  
+   return true;
 
-        std::string dataConvert = std::to_string(playerX) + " " + std::to_string(playerY);
-        const char* data = dataConvert.c_str();
-        sendData(data);
-    }
 }
 
 void MorpionServer::draw()
@@ -101,7 +100,7 @@ void MorpionServer::switchPlayer() {
 inline int MorpionServer::sendData(const char data[4096])
 {
 
-    iResult = send(ConnectSocket, data, (int)strlen(data), 0);
+    /*iResult = send(ConnectSocket, data, (int)strlen(data), 0);*/
 
     return 0;
 }

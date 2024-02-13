@@ -27,17 +27,15 @@ void Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
 
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
-        OutputDebugStringA("event detecte \n");
+        printf("event detecte \n");
         sendData(data);
-
-       
     }
     return;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
     window.clear();
-
+    
     // Dessiner la grille
     for (int i = 0; i < gridSize; ++i) {
         for (int j = 0; j < gridSize; ++j) {
@@ -135,6 +133,7 @@ int main() {
     Morpion game;
 
     while (window.isOpen()) {
+        
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -143,9 +142,9 @@ int main() {
             }
 
             game.handleEvent(event, window);
-                
+            //recvData();
         }
-
+       
         game.draw(window);
 
     }
