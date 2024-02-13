@@ -14,7 +14,7 @@ static SOCKET ConnectSocket = INVALID_SOCKET;
 
 
 
-inline int client(char* callback)
+inline int client()
 {
     WSADATA wsaData;
 

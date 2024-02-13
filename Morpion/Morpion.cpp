@@ -10,10 +10,6 @@ const int cellSize = 100;
 inline int client(char* callback);
 inline int killClient();
 
-
-
-
-
 Morpion::Morpion() : currentPlayer(Player::CircleRed) {
     // Initialiser la grille avec des valeurs par défaut
     board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
@@ -133,7 +129,7 @@ std::string getPlayerName() {
 
 int main() {
 
-
+    client();
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     Morpion game;

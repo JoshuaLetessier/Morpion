@@ -76,6 +76,7 @@ int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_
 	WSADATA wsaData;
 
 	MorpionServer Mserve;
+	Mserve.main();
 
 
 	if ((Window = MakeWorkerWindow()) == NULL)
@@ -212,12 +213,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SocketInfo = GetSocketInformation(wParam);
 
 				// Read data only if the receive buffer is empty
-
-				/*if (SocketInfo == NULL)
-				{
-					printf("SocketInfo Null");
-					return;
-				}*/
+				
 				if (SocketInfo->BytesRECV != 0)
 				{
 					SocketInfo->RecvPosted = TRUE;
@@ -281,16 +277,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 
 				}
-
+				break;
 				// DO NOT BREAK HERE SINCE WE GOT A SUCCESSFUL RECV. Go ahead
 
 				// and begin writing data to the client
 
-
-			/*case FD_CLOSE:
+			
+			case FD_CLOSE:
 				printf("Closing socket \n");
 				FreeSocketInformation(wParam);
-				break;*/
+				break;
 			}
 		}
 		return 0;
