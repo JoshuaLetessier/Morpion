@@ -13,7 +13,7 @@ static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
 inline int sendData(const char data[4096]);
-inline int recvData();
+inline char* recvData();
 
 inline int client()
 {
@@ -108,7 +108,7 @@ inline int sendData(const char data[4096])
     }
 }
 
-inline int recvData() {
+inline char* recvData() {
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
@@ -121,5 +121,5 @@ inline int recvData() {
     else {
         printf("recv failed with error: %d\n", WSAGetLastError());
     }
-    return iResult;
+    return recvbuf;
 }
