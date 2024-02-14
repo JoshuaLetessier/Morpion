@@ -7,6 +7,7 @@ public:
 	enum class Player { None, CircleRed, CircleBalck };
 	std::vector<std::vector<int>> board;
 	int currentPlayer;
+	int myPlayerVal;
 
 	bool handleEvent(sf::Event& event, sf::RenderWindow& window);
 	void swapPlayer();
