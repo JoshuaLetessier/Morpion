@@ -38,42 +38,9 @@ void Threading::DisplayMessage(HANDLE hScreen, char* ThreadName, int Data, int C
 //-------------------------------------------
 DWORD WINAPI Threading::Thread_ws(LPVOID lpParam)
 {
-    std::cout << "ooo" << std::endl;
-    printf("YOLO");
-    MSG msg;
-    //GetMessageW(&msg, NULL, 0, 0);
-    MyWindow::LaunchServ;
-
+    windowInstance.LaunchServ();
     return 0;
 }
-
-//-------------------------------------------
-// A function that represents Thread number 2
-//-------------------------------------------
-//DWORD WINAPI Threading::Thread_no_2(LPVOID lpParam)
-//{
-//    // serveur web
-//    int     Data = 0;
-//    int     count = 0;
-//    HANDLE  hStdout = NULL;
-//
-//    // Get Handle To screen. Else how will we print?
-//    if ((hStdout =
-//        GetStdHandle(STD_OUTPUT_HANDLE)) ==
-//        INVALID_HANDLE_VALUE)
-//        return 1;
-//
-//    // Cast the parameter to the correct
-//    // data type passed by callee i.e main() in our case.
-//    Data = *((int*)lpParam);
-//
-//    for (count = 0; count <= 7; count++)
-//    {
-//        //DisplayMessage(hStdout, "Thread_no_2", Data, count);
-//    }
-//
-//    return 0;
-//}
 
 void Threading::LaunchThread()
 {
@@ -89,20 +56,9 @@ void Threading::LaunchThread()
     if (Handle_Of_Thread_ws == NULL)
         ExitProcess(Data_Of_Thread_ws);
 
-    // Create thread 2.
-    /*Handle_Of_Thread_2 = CreateThread(NULL, 0, Thread_no_2, &Data_Of_Thread_2, 0, NULL);
-    if (Handle_Of_Thread_2 == NULL)
-        ExitProcess(Data_Of_Thread_2);*/
-
-
-    // Store Thread handles in Array of Thread
-    // Handles as per the requirement
-    // of WaitForMultipleObjects() 
     Array_Of_Thread_Handles[0] = Handle_Of_Thread_ws;
-    //Array_Of_Thread_Handles[1] = Handle_Of_Thread_2;
 
     // Wait until all threads have terminated.
-    //WaitForMultipleObjects(1, Array_Of_Thread_Handles, TRUE, INFINITE);
     WaitForSingleObject(Array_Of_Thread_Handles[0], INFINITE);
 
     // Close all thread handles upon completion.

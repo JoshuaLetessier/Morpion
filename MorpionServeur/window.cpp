@@ -290,7 +290,6 @@ int MyWindow::LaunchServ() {
 	HWND Window;
 	WSADATA wsaData;
 	MorpionServer Mserve;
-	std::cout << "LaunchServ" << std::endl;
 
 	if ((Window = MyWindow::MakeWorkerWindow()) == NULL)
 	{
