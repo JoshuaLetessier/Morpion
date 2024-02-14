@@ -13,7 +13,7 @@ inline int client();
 inline int killClient();
 
 Morpion game;
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 LPSOCKET_INFORMATION SocketInfoList;
 
