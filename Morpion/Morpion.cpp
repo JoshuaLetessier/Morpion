@@ -43,7 +43,7 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
 
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
-
+        printf("event detecte \n");
         sendData(data);
 
         return true;
@@ -61,7 +61,7 @@ void Morpion::swapPlayer()
 
 void Morpion::setTileVal(int targetX, int targetY, int value)
 {
-    board[targetY][targetX] = value;
+    board[targetX][targetY] = value;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
@@ -159,53 +159,11 @@ std::string getPlayerName() {
     return inputText.toAnsiString();
 }
 
-HWND MakeWorkerWindow(void)
-{
-    WNDCLASS wndclass;
-    const CHAR* ProviderClass = "AsyncSelect";
-    HWND Window;
-
-    wndclass.style = CS_HREDRAW | CS_VREDRAW;
-    wndclass.lpfnWndProc = (WNDPROC)WindowProc;
-    wndclass.cbClsExtra = 0;
-    wndclass.cbWndExtra = 0;
-    wndclass.hInstance = NULL;
-    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wndclass.lpszMenuName = NULL;
-    wndclass.lpszClassName = (LPCWSTR)ProviderClass;
-
-    if (RegisterClass(&wndclass) == 0)
-    {
-        printf("RegisterClass() failed with error %d\n", GetLastError());
-        return NULL;
-    }
-    else
-        printf("RegisterClass() is OK!\n");
-
-    // Create a window
-
-    if ((Window = CreateWindow((LPCWSTR)ProviderClass, L"", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, NULL, NULL)) == NULL)
-    {
-        printf("CreateWindow() failed with error %d\n", GetLastError());
-        return NULL;
-    }
-    else
-        printf("CreateWindow() is OK!\n");
-
-    return Window;
-
-}
-
-int WINAPI main() {
-
-    HWND Window;
+int main() {
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     client();
-    MakeWorkerWindow();
     while (window.isOpen()) {
        
         sf::Event event;
@@ -214,88 +172,18 @@ int WINAPI main() {
                 window.close();
                 killClient();
             }
-            //si la methode read est ok
-            //alors recvData()
             if (game.handleEvent(event, window))
             {
-                
+                char* data = recvData();
+                int newPosX = (int)data[0]-48;
+                int newPosY = (int)data[2]-48;
+                printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);
+
+                game.setTileVal(newPosX, newPosY, game.currentPlayer);
             }
         }
         game.draw(window);
         
     }
     return 0;
-}
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    LPSOCKET_INFORMATION SocketInfo;
-    SocketInfo = (LPSOCKET_INFORMATION)GlobalAlloc(GPTR, sizeof(SOCKET_INFORMATION));
-    SocketInfo->Socket = ConnectSocket;
-    SOCKET Accept;
-    DWORD RecvBytes;
-    DWORD SendBytes;
-    DWORD Flags;
-
-    if (uMsg == WM_SOCKET)
-    {
-        if (WSAGETSELECTERROR(lParam))
-        {
-            printf("Socket failed with error %d\n", WSAGETSELECTERROR(lParam));
-        }
-        else
-        {
-            printf("Socket looks fine!\n");
-            switch (WSAGETSELECTEVENT(lParam))
-            {
-
-            case FD_READ:
-
-                SocketInfo->Socket = ConnectSocket;
-
-                if (SocketInfo->BytesRECV != 0)
-                {
-                    SocketInfo->RecvPosted = TRUE;
-                    return 0;
-                }
-                else
-                {
-                    SocketInfo->DataBuf.buf = SocketInfo->Buffer;
-                    SocketInfo->DataBuf.len = DEFAULT_BUFLEN;
-
-                    if (WSARecv(SocketInfo->Socket, &(SocketInfo->DataBuf), 1, &RecvBytes, 0, NULL, NULL) == SOCKET_ERROR)
-                    {
-                        if (WSAGetLastError() != WSAEWOULDBLOCK)
-                        {
-                            printf("WSARecv() failed with error %d\n", WSAGetLastError());
-                            return 0;
-                        }
-
-                    }
-                    else // No error so update the byte count
-                    {
-
-                        char* data = recvData();
-
-                        int newPosX = (int)data[0] - 48;
-                        int newPosY = (int)data[2] - 48;
-                        int curPlayer = (int)data[4] - 48;
-                        printf("data printed from morpion.cpp: %d, %d, %d", newPosX, newPosY, curPlayer);
-
-                        game.currentPlayer = curPlayer;
-
-                        game.setTileVal(newPosX, newPosY, game.currentPlayer);
-                        if (RecvBytes == 0)
-                        {
-                            printf("Socket deconnecté \n");
-                        }
-                        SocketInfo->BytesRECV = 0;
-                    }
-                }
-                break;
-            }
-        }
-        return 0;
-    }
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

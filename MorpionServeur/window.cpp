@@ -474,7 +474,8 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
 					SocketInfo->BytesRECV = 0;
 				}
-			}
+			//}
+			
 		}
 		else
 		{
