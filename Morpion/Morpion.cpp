@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "Morpion.hpp"
-#include "client.cpp"
 
 #define WM_SOCKET (WM_USER + 1)
 
@@ -161,7 +160,8 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
-    client();
+    clientServe.LaunchThread();
+
     while (window.isOpen()) {
 
         sf::Event event;

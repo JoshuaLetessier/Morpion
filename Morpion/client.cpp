@@ -12,8 +12,6 @@
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
-
-
 inline int sendData(const char data[4096]);
 inline char* recvData();
 
@@ -113,9 +111,7 @@ inline int sendData(const char data[4096])
 inline char* recvData() {
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-    printf("printf 3");
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-    printf("printf 4");
     if (iResult > 0) {
         printf("Received %d bytes from server: %.*s\n", iResult, recvbuf);
     }
