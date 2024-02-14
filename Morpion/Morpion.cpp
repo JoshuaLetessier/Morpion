@@ -4,20 +4,32 @@
 #include "Morpion.hpp"
 #include "client.cpp"
 
+#define WM_SOCKET (WM_USER + 1)
+
 const int gridSize = 3;
 const int cellSize = 100;
 
 inline int client();
 inline int killClient();
 
+Morpion game;
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 Morpion::Morpion() 
 {
     // Initialiser la grille avec des valeurs par défaut
     board = std::vector<std::vector<int>>(gridSize, std::vector<int>(gridSize, 0));
     currentPlayer = 1;
+    myPlayerVal = 1;
+
 }
 
 bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
+    if (myPlayerVal != currentPlayer)
+    {
+        return false;
+    }
+
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
@@ -29,7 +41,7 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
 
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
-        //printf("event detecte \n");
+
         sendData(data);
 
         return true;
@@ -145,11 +157,59 @@ std::string getPlayerName() {
     return inputText.toAnsiString();
 }
 
-int main() {
+HWND MakeWorkerWindow(void)
+{
+    WNDCLASS wndclass;
+    const CHAR* ProviderClass = "AsyncSelect";
+    HWND Window;
+
+    wndclass.style = CS_HREDRAW | CS_VREDRAW;
+    wndclass.lpfnWndProc = (WNDPROC)WindowProc;
+    wndclass.cbClsExtra = 0;
+    wndclass.cbWndExtra = 0;
+    wndclass.hInstance = NULL;
+    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wndclass.lpszMenuName = NULL;
+    wndclass.lpszClassName = (LPCWSTR)ProviderClass;
+
+    if (RegisterClass(&wndclass) == 0)
+    {
+        printf("RegisterClass() failed with error %d\n", GetLastError());
+        return NULL;
+    }
+    else
+        printf("RegisterClass() is OK!\n");
+
+    // Create a window
+
+    if ((Window = CreateWindow((LPCWSTR)ProviderClass, L"", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, NULL, NULL)) == NULL)
+    {
+        printf("CreateWindow() failed with error %d\n", GetLastError());
+        return NULL;
+    }
+    else
+        printf("CreateWindow() is OK!\n");
+    //ShowWindow(Window, SW_SHOW);
+    return Window;
+
+}
+
+int WINAPI main() {
+
+    HWND Window;
+
+    //if ((Window = MakeWorkerWindow()) == NULL)
+    //{
+    //    printf("MakeWorkerWindow() failed!\n");
+    //    return 1;
+    //}
+    //else
+    //    printf("MakeWorkerWindow() is OK!\n");
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
-    Morpion game;
     client();
     while (window.isOpen()) {
        
@@ -159,18 +219,53 @@ int main() {
                 window.close();
                 killClient();
             }
+            //si la methode read est ok
+            //alors recvData()
             if (game.handleEvent(event, window))
             {
-                char* data = recvData();
-                int newPosX = (int)data[0]-48;
-                int newPosY = (int)data[2]-48;
-                printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);
-
-                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+                MakeWorkerWindow();
             }
         }
         game.draw(window);
         
     }
     return 0;
+}
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    //SOCKET Accept;
+    //DWORD RecvBytes;
+    //DWORD SendBytes;
+    //DWORD Flags;
+
+    if (uMsg == WM_SOCKET)
+    {
+        if (WSAGETSELECTERROR(lParam))
+        {
+            printf("Socket failed with error %d\n", WSAGETSELECTERROR(lParam));
+        }
+        else
+        {
+            printf("Socket looks fine!\n");
+            switch (WSAGETSELECTEVENT(lParam))
+            {
+
+            case FD_READ:
+                char* data = recvData();
+
+                int newPosX = (int)data[0] - 48;
+                int newPosY = (int)data[2] - 48;
+                int curPlayer = (int)data[4] - 48;
+                printf("data printed from morpion.cpp: %d, %d, %d", newPosX, newPosY, curPlayer);
+
+                game.currentPlayer = curPlayer;
+
+                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+                break;
+            }
+        }
+        return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
