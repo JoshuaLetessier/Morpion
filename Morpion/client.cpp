@@ -12,23 +12,7 @@
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
-typedef struct _SOCKET_INFORMATION {
 
-    BOOL RecvPosted;
-
-    CHAR Buffer[DEFAULT_BUFLEN];
-
-    WSABUF DataBuf;
-
-    SOCKET Socket;
-
-    DWORD BytesSEND;
-
-    DWORD BytesRECV;
-
-    int color;
-
-} SOCKET_INFORMATION, * LPSOCKET_INFORMATION;
 
 inline int sendData(const char data[4096]);
 inline char* recvData();

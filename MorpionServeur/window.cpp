@@ -450,7 +450,7 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 			
 			for (LPSOCKET_INFORMATION currentClient = SocketInfoList; currentClient != NULL; currentClient = currentClient->Next)
 			{
-				
+
 				if (SocketInfo->color == 2)
 				{
 					dataClient += " 2";
@@ -463,7 +463,7 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
 					SocketInfo->BytesRECV = 0;
 				}
-				else if (SocketInfo->color == 1 )
+				else if (SocketInfo->color == 1)
 				{
 					dataClient += " 1";
 					int iResult = send(currentClient->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
@@ -474,7 +474,7 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
 					SocketInfo->BytesRECV = 0;
 				}
-			//}
+			}
 			
 		}
 		else

@@ -12,10 +12,6 @@ const int cellSize = 100;
 inline int client();
 inline int killClient();
 
-Morpion game;
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-LPSOCKET_INFORMATION SocketInfoList;
 
 Morpion::Morpion() 
 {
@@ -61,7 +57,7 @@ void Morpion::swapPlayer()
 
 void Morpion::setTileVal(int targetX, int targetY, int value)
 {
-    board[targetX][targetY] = value;
+    board[targetY][targetX] = value;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
@@ -160,6 +156,8 @@ std::string getPlayerName() {
 }
 
 int main() {
+
+    Morpion game;
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
