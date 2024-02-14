@@ -32,7 +32,8 @@ static int iResult = 0;
 
 MorpionServer::MorpionServer()
 {
-       board = std::vector<std::vector<int>>(gridSize, std::vector<int>(gridSize, 0));   
+       board = std::vector<std::vector<int>>(gridSize, std::vector<int>(gridSize, 0));  
+       currentPlayer = 1;
 }
 
 bool MorpionServer::handleEvent(int playerX, int playerY)
@@ -41,7 +42,7 @@ bool MorpionServer::handleEvent(int playerX, int playerY)
    
 
     printf("valeur de la case avant le clique %d %d %d\n", board[playerX][playerY], playerX, playerY);
- 
+    
     if (board[playerX][playerY] == 0 && playerX >= 0 && playerX < gridSize && playerY >= 0 && playerY < gridSize)
     {
         board[playerX][playerY] = 1;
@@ -121,4 +122,6 @@ void editJson(std::string newName, bool newVictory, std::time_t newDate)
 {
 
 }
+
+
 
