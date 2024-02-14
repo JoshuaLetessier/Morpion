@@ -110,7 +110,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\SFML-2.6.1\include;$(ProjectDir)..\jsoncppdist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML-2.6.1\lib</AdditionalLibraryDirectories>
@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Json.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="MorpionServeur.cpp" />
     <ClCompile Include="Threading.cpp" />
     <ClCompile Include="Window.cpp" />

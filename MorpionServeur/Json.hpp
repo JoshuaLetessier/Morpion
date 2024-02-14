@@ -17,7 +17,7 @@ public:
 	// Interaction save_morpion
 	void importName1Json(char newName);
 	void importName2Json(char newName);
-	void importMoveJson(const char* newMove);
+	void importMoveJson(std::string newMove);
 	void importVictoryJson(bool player1Victory);
 
 	// Interaction getters

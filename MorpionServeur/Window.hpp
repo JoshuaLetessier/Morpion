@@ -1,7 +1,17 @@
 #pragma once
+#include <windows.h>
+#include <winsock2.h>
+#include "Json.hpp"
+
+#define DEFAULT_BUFLEN 512
+#define DATA_BUFSIZE 8192
+#define PORT 27015
+#define WM_SOCKET (WM_USER + 1)
+#define MAX_CLIENTS 2
 
 class MyWindow {
 public:
+
     MyWindow();
     ~MyWindow();
 
@@ -17,6 +27,7 @@ public:
         const char* color;
     } SOCKET_INFORMATION, * LPSOCKET_INFORMATION;
 
+
     static SOCKET_INFORMATION clientSockets[MAX_CLIENTS];
 
     
@@ -29,6 +40,7 @@ public:
     static LPSOCKET_INFORMATION GetSocketInformation(SOCKET s);
     static void FreeSocketInformation(SOCKET s);
     static HWND MakeWorkerWindow(void);
+    static int LaunchServ();
 
 private:
     SOCKET Listen;
@@ -36,7 +48,8 @@ private:
 
 };
 // Global var
-extern MyWindow::LPSOCKET_INFORMATION SocketInfoList;
-
+static Json save;
+static MSG msg;
+static MyWindow::LPSOCKET_INFORMATION SocketInfoList;
 static char recvbuf[DEFAULT_BUFLEN];
 static bool firstSocket;

@@ -76,7 +76,7 @@ void Json::importName2Json(char newName) // Enregistre le nom du joueur 2
 	}
 }
 
-void Json::importMoveJson(const char* newMove) // Enregistre le dernier mouvement
+void Json::importMoveJson(std::string newMove) // Enregistre le dernier mouvement
 {
 	if (!save_morpion["player1"]["victory"] && !save_morpion["player2"]["victory"])
 	{

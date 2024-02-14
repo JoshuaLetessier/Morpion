@@ -1,24 +1,18 @@
 ﻿#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 
-#include <windows.h>
-#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
 #include <string>
+#include <iostream>
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "User32.lib")
 #pragma comment (lib, "Gdi32.lib")
 // #pragma comment (lib, "Mswsock.lib")
-#define PORT 27015
-#define DATA_BUFSIZE 8192
-#define DEFAULT_BUFLEN 512
-#define WM_SOCKET (WM_USER + 1)
-#define MAX_CLIENTS 2
 
 #include "MorpionServer.hpp"
 #include "Threading.hpp"
@@ -27,10 +21,8 @@
 // typedef definition
 
 
-MyWindow::MyWindow() : Listen(INVALID_SOCKET), Window(NULL) 
-{
-	//static LPSOCKET_INFORMATION SocketInfoList;
-}
+MyWindow::MyWindow() : Listen(INVALID_SOCKET), Window(NULL)
+{}
 
 MyWindow::~MyWindow() {
 	WSACleanup();
@@ -40,7 +32,6 @@ void MyWindow::StartServer() {
 	Initialize();
 
 	// Boucle de messages de fenêtre
-	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -144,6 +135,10 @@ LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 							std::string data;
 							data.resize(20);
 							sprintf_s(&data[0], data.size(), " %d", result);
+							if (sizeof(data) == 5)
+							{
+								save.importMoveJson(data);
+							}
 							// Envoie les données à l'autre socket
 							//send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici à régler 
 						}
@@ -288,14 +283,14 @@ HWND MyWindow::MakeWorkerWindow(void)
 
 }
 
-int WINAPI main(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) { // Changer de main a WinMain pour faire apparaitre/disparaitre la console en plus de la windows
-	MSG msg;
+int MyWindow::LaunchServ() {
 	DWORD Ret;
 	SOCKET Listen;
 	SOCKADDR_IN InternetAddr;
 	HWND Window;
 	WSADATA wsaData;
 	MorpionServer Mserve;
+	std::cout << "LaunchServ" << std::endl;
 
 	if ((Window = MyWindow::MakeWorkerWindow()) == NULL)
 	{
