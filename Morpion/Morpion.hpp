@@ -2,17 +2,17 @@
 class Morpion {
 public:
 
-
 	Morpion();
 
 	enum class Player { None, CircleRed, CircleBalck };
-	std::vector<std::vector<Player>> board;
-	Player currentPlayer;
+	std::vector<std::vector<int>> board;
+	int currentPlayer;
+	int myPlayerVal;
 
-	void handleEvent(sf::Event& event);
+	bool handleEvent(sf::Event& event, sf::RenderWindow& window);
+	void swapPlayer();
+	void setTileVal(int targetX, int targetY, int value);
 	void draw(sf::RenderWindow& window);
-	bool checkGameOver() const;
-	void switchPlayer();
 	void drawCircleR(sf::RenderWindow& window, float x, float y);
 	void drawCircle(sf::RenderWindow& window, float x, float y);
 };
