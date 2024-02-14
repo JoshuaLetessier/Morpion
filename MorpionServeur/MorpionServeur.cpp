@@ -37,22 +37,24 @@ MorpionServer::MorpionServer()
 
 bool MorpionServer::handleEvent(int playerX, int playerY)
 {
-    printf("handle cote serveur\n");
+    //printf("handle cote serveur\n");
    
 
-    printf("%d \n", board[playerX][playerY]);
-    if (playerX >= 0 && playerX < gridSize && playerY >= 0 && playerY < gridSize && board[playerX][playerY] == 0)
+    printf("valeur de la case avant le clique %d %d %d\n", board[playerX][playerY], playerX, playerY);
+ 
+    if (board[playerX][playerY] == 0 && playerX >= 0 && playerX < gridSize && playerY >= 0 && playerY < gridSize)
     {
         board[playerX][playerY] = 1;
-        printf("%d \n", board[playerX][playerY]);
+        printf("valeur de la case après le clique %d \n", board[playerX][playerY]);
         //switchPlayer();
         return true;
     } 
     else
     {
+        printf("Erreur taille vector \n");
         return false;
     }
-    return false;
+    
 }
 
 void MorpionServer::draw()

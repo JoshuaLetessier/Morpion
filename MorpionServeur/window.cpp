@@ -441,15 +441,17 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 
 		int posX = std::stoi(dataClient.substr(0, 1));
 		int posY = std::stoi(dataClient.substr(2, 1));
-		printf("%d\n", posX);
+		//printf("%d\n", posX);
 		if (Mserve.handleEvent(posX, posY) == true)
 		{
-			/*for (LPSOCKET_INFORMATION currentClient = SocketInfoList; currentClient != NULL; currentClient = currentClient->Next)
-			{*/
+			for (LPSOCKET_INFORMATION currentClient = SocketInfoList; currentClient != NULL; currentClient = currentClient->Next)
+			{
+				printf("itération");
 				if (SocketInfo->color == "black" && SocketNumber == 1)
 				{
 					dataClient += " black";
-					int iResult = send(SocketInfo->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					int iResult = send(currentClient->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					//printf("Send %d bytes to client: %.*s\n", iResult, recvbuf);
 					if (iResult == SOCKET_ERROR) {
 						printf("send failed: %d\n", WSAGetLastError());
 					}
@@ -457,10 +459,10 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
 					SocketInfo->BytesRECV = 0;
 				}
-				else if (SocketInfo->color == "red" && SocketNumber == 1)
+				else if (SocketInfo->color == "red" && SocketNumber == 2)
 				{
 					dataClient += " red";
-					int iResult = send(SocketInfo->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					int iResult = send(currentClient->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
 					if (iResult == SOCKET_ERROR) {
 						printf("send failed: %d\n", WSAGetLastError());
 					}
@@ -468,8 +470,7 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
 					SocketInfo->BytesRECV = 0;
 				}
-			//}
-			
+			}
 		}
 		else
 		{

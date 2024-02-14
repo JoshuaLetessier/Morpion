@@ -29,7 +29,7 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
 
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
-        printf("event detecte \n");
+        //printf("event detecte \n");
         sendData(data);
 
         return true;
@@ -47,7 +47,7 @@ void Morpion::swapPlayer()
 
 void Morpion::setTileVal(int targetX, int targetY, int value)
 {
-    board[targetX][targetY] = value;
+    board[targetY][targetX] = value;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
