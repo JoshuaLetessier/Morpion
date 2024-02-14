@@ -15,6 +15,8 @@ inline int killClient();
 Morpion game;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+LPSOCKET_INFORMATION SocketInfoList;
+
 Morpion::Morpion() 
 {
     // Initialiser la grille avec des valeurs par défaut
@@ -191,7 +193,7 @@ HWND MakeWorkerWindow(void)
     }
     else
         printf("CreateWindow() is OK!\n");
-    //ShowWindow(Window, SW_SHOW);
+
     return Window;
 
 }
@@ -200,17 +202,10 @@ int WINAPI main() {
 
     HWND Window;
 
-    //if ((Window = MakeWorkerWindow()) == NULL)
-    //{
-    //    printf("MakeWorkerWindow() failed!\n");
-    //    return 1;
-    //}
-    //else
-    //    printf("MakeWorkerWindow() is OK!\n");
-
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
     client();
+    MakeWorkerWindow();
     while (window.isOpen()) {
        
         sf::Event event;
@@ -223,7 +218,7 @@ int WINAPI main() {
             //alors recvData()
             if (game.handleEvent(event, window))
             {
-                MakeWorkerWindow();
+                
             }
         }
         game.draw(window);
@@ -234,10 +229,13 @@ int WINAPI main() {
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    //SOCKET Accept;
-    //DWORD RecvBytes;
-    //DWORD SendBytes;
-    //DWORD Flags;
+    LPSOCKET_INFORMATION SocketInfo;
+    SocketInfo = (LPSOCKET_INFORMATION)GlobalAlloc(GPTR, sizeof(SOCKET_INFORMATION));
+    SocketInfo->Socket = ConnectSocket;
+    SOCKET Accept;
+    DWORD RecvBytes;
+    DWORD SendBytes;
+    DWORD Flags;
 
     if (uMsg == WM_SOCKET)
     {
@@ -252,16 +250,48 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
 
             case FD_READ:
-                char* data = recvData();
 
-                int newPosX = (int)data[0] - 48;
-                int newPosY = (int)data[2] - 48;
-                int curPlayer = (int)data[4] - 48;
-                printf("data printed from morpion.cpp: %d, %d, %d", newPosX, newPosY, curPlayer);
+                SocketInfo->Socket = ConnectSocket;
 
-                game.currentPlayer = curPlayer;
+                if (SocketInfo->BytesRECV != 0)
+                {
+                    SocketInfo->RecvPosted = TRUE;
+                    return 0;
+                }
+                else
+                {
+                    SocketInfo->DataBuf.buf = SocketInfo->Buffer;
+                    SocketInfo->DataBuf.len = DEFAULT_BUFLEN;
 
-                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+                    if (WSARecv(SocketInfo->Socket, &(SocketInfo->DataBuf), 1, &RecvBytes, 0, NULL, NULL) == SOCKET_ERROR)
+                    {
+                        if (WSAGetLastError() != WSAEWOULDBLOCK)
+                        {
+                            printf("WSARecv() failed with error %d\n", WSAGetLastError());
+                            return 0;
+                        }
+
+                    }
+                    else // No error so update the byte count
+                    {
+
+                        char* data = recvData();
+
+                        int newPosX = (int)data[0] - 48;
+                        int newPosY = (int)data[2] - 48;
+                        int curPlayer = (int)data[4] - 48;
+                        printf("data printed from morpion.cpp: %d, %d, %d", newPosX, newPosY, curPlayer);
+
+                        game.currentPlayer = curPlayer;
+
+                        game.setTileVal(newPosX, newPosY, game.currentPlayer);
+                        if (RecvBytes == 0)
+                        {
+                            printf("Socket deconnecté \n");
+                        }
+                        SocketInfo->BytesRECV = 0;
+                    }
+                }
                 break;
             }
         }

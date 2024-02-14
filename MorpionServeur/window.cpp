@@ -445,7 +445,7 @@ void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes )
 		int posX = std::stoi(dataClient.substr(0, 1));
 		int posY = std::stoi(dataClient.substr(2, 1));
 		//printf("%d\n", posX);
-		if (Mserve.handleEvent(posX, posY) == true && SocketNumber == 2)
+		if (Mserve.handleEvent(posX, posY) == true && SocketNumber == 1)
 		{
 			
 			for (LPSOCKET_INFORMATION currentClient = SocketInfoList; currentClient != NULL; currentClient = currentClient->Next)
