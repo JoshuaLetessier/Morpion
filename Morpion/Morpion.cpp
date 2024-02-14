@@ -13,7 +13,7 @@ inline int client();
 inline int killClient();
 
 Morpion game;
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 LPSOCKET_INFORMATION SocketInfoList;
 
@@ -166,7 +166,7 @@ HWND MakeWorkerWindow(void)
     HWND Window;
 
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
-    wndclass.lpfnWndProc = (WNDPROC)WindowProc;
+    wndclass.lpfnWndProc = (WNDPROC)WndProc;
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = NULL;
@@ -206,6 +206,28 @@ int WINAPI main() {
 
     client();
     MakeWorkerWindow();
+
+    //if (WSAStartup((2, 2), &wsaData) != 0)
+    //{
+    //    printf("WSAStartup() failed with error %d\n", WSAGetLastError());
+    //    return 1;
+    //}
+    //else
+    //    printf("WSAStartup() is OK!\n");
+
+    //if ((Listen = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+    //{
+    //    printf("socket() failed with error %d\n", WSAGetLastError());
+    //    return 1;
+    //}
+    //else
+    //    printf("socket() is pretty fine!\n");
+
+    //if (WSAAsyncSelect(Listen, Window, WM_SOCKET, FD_ACCEPT | FD_READ | FD_CLOSE) == 0)
+    //    printf("WSAAsyncSelect() is OK lol!\n");
+    //else
+    //    printf("WSAAsyncSelect() failed with error code %d\n", WSAGetLastError());
+
     while (window.isOpen()) {
        
         sf::Event event;
@@ -227,7 +249,7 @@ int WINAPI main() {
     return 0;
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LPSOCKET_INFORMATION SocketInfo;
     SocketInfo = (LPSOCKET_INFORMATION)GlobalAlloc(GPTR, sizeof(SOCKET_INFORMATION));
@@ -236,6 +258,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     DWORD RecvBytes;
     DWORD SendBytes;
     DWORD Flags;
+
+    printf("callback \n");
 
     if (uMsg == WM_SOCKET)
     {
