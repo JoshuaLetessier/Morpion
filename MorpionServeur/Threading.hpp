@@ -13,6 +13,6 @@ public:
 	void LaunchThread();
 
 private:
-	MyWindow ThreadWindow;
+	static MyWindow ThreadWindow;
 	
 };

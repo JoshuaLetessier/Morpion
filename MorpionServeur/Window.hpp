@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <winsock2.h>
 #include "Json.hpp"
+#include "MorpionServer.hpp"
 
 #define DEFAULT_BUFLEN 512
 #define DATA_BUFSIZE 8192
@@ -24,7 +25,7 @@ public:
         DWORD BytesSEND;
         DWORD BytesRECV;
         struct _SOCKET_INFORMATION* Next;
-        const char* color;
+        int color;
     } SOCKET_INFORMATION, * LPSOCKET_INFORMATION;
 
 
@@ -40,6 +41,7 @@ public:
     static LPSOCKET_INFORMATION GetSocketInformation(SOCKET s);
     static void FreeSocketInformation(SOCKET s);
     static HWND MakeWorkerWindow(void);
+    static void UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes);
     static int LaunchServ();
 
 private:
@@ -49,7 +51,9 @@ private:
 };
 // Global var
 static Json save;
+static MorpionServer Mserve;
 static MSG msg;
 static MyWindow::LPSOCKET_INFORMATION SocketInfoList;
 static char recvbuf[DEFAULT_BUFLEN];
 static bool firstSocket;
+static int SocketNumber = 0;

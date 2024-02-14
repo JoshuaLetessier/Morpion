@@ -38,11 +38,8 @@ void Threading::DisplayMessage(HANDLE hScreen, char* ThreadName, int Data, int C
 //-------------------------------------------
 DWORD WINAPI Threading::Thread_ws(LPVOID lpParam)
 {
-    std::cout << "ooo" << std::endl;
-    printf("YOLO");
     MSG msg;
-    //GetMessageW(&msg, NULL, 0, 0);
-    MyWindow::LaunchServ;
+    ThreadWindow.LaunchServ();
 
     return 0;
 }

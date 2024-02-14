@@ -93,14 +93,10 @@ LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 				break;
 
 			case FD_READ:
-				SocketInfo = GetSocketInformation(wParam);
 
+				SocketInfo = GetSocketInformation(wParam);
 				// Read data only if the receive buffer is empty
-				/*if (SocketInfo == NULL)
-				{
-					printf("SocketInfo Null");
-					return;
-				}*/
+
 				if (SocketInfo->BytesRECV != 0)
 				{
 					SocketInfo->RecvPosted = TRUE;
@@ -110,6 +106,7 @@ LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 				{
 					SocketInfo->DataBuf.buf = SocketInfo->Buffer;
 					SocketInfo->DataBuf.len = DATA_BUFSIZE;
+
 					Flags = 0;
 					if (WSARecv(SocketInfo->Socket, &(SocketInfo->DataBuf), 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
 					{
@@ -119,36 +116,16 @@ LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 							FreeSocketInformation(wParam);
 							return 0;
 						}
+
 					}
 					else // No error so update the byte count
 					{
-						printf("WSARecv() is OK!\n");
-						SocketInfo->DataBuf.buf[RecvBytes] = 0;
-						OutputDebugStringA(SocketInfo->DataBuf.buf);
-						SocketInfo->BytesRECV = RecvBytes;
-						int result = recv(SocketInfo->Socket, recvbuf, (int)strlen(recvbuf), 0);
-						if (result > 0)
+						UpdateClient(SocketInfo, RecvBytes);
+						if (RecvBytes == 0)
 						{
-							printf("%.*s\n", result, recvbuf);
+							printf("Socket deconnecté \n");
 						}
-						if (strcmp(SocketInfo[0].color, "black") == 0) {
-							std::string data;
-							data.resize(20);
-							sprintf_s(&data[0], data.size(), " %d", result);
-							if (sizeof(data) == 5)
-							{
-								save.importMoveJson(data);
-							}
-							// Envoie les données à l'autre socket
-							//send(SocketInfo[1].Socket, data.c_str(), (int)strlen(data.c_str()), 0);//pb ici à régler 
-						}
-						else
-						{
-							char data[20];
-							sprintf_s(data, sizeof(data), " %d", result);
-							// Envoie les données à l'autre socket
-							//send(SocketInfo[2].Socket, data, (int)strlen(data), 0);
-						}
+						SocketInfo->BytesRECV = 0;
 					}
 				}
 				break;
@@ -157,6 +134,7 @@ LRESULT CALLBACK MyWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 
 			case FD_CLOSE:
 				printf("Closing socket \n");
+				SocketNumber -= 1;
 				FreeSocketInformation(wParam);
 				break;
 			}
@@ -177,10 +155,12 @@ void MyWindow::CreateSocketInformation(SOCKET s)
 		else
 		{
 			printf("GlobalAlloc() for SOCKET_INFORMATION is OK!\n");
+
 			if (firstSocket)
 			{
-				const char* colorPlayer = "black";
-				send(s, colorPlayer, (int)strlen(colorPlayer), 0);
+				int colorPlayer = 2;
+				std::string data = std::to_string(colorPlayer);
+				send(s, data.c_str(), (int)strlen(data.c_str()), 0);
 				SI->Socket = s;
 				SI->RecvPosted = FALSE;
 				SI->BytesSEND = 0;
@@ -189,12 +169,15 @@ void MyWindow::CreateSocketInformation(SOCKET s)
 				SocketInfoList = SI;
 				SI->color = colorPlayer;
 				firstSocket = false;
+				SocketNumber += 1;
+
 				break;
 			}
 			else
 			{
-				const char* colorPlayer = "red";
-				send(s, colorPlayer, (int)strlen(colorPlayer), 0);
+				int colorPlayer = 1;
+				std::string data = std::to_string(colorPlayer);
+				send(s, data.c_str(), (int)strlen(data.c_str()), 0);
 				SI->Socket = s;
 				SI->RecvPosted = FALSE;
 				SI->BytesSEND = 0;
@@ -202,6 +185,8 @@ void MyWindow::CreateSocketInformation(SOCKET s)
 				SI->Next = SocketInfoList;
 				SocketInfoList = SI;
 				SI->color = colorPlayer;
+				SocketNumber += 1;
+
 				break;
 			}
 		}
@@ -283,6 +268,68 @@ HWND MyWindow::MakeWorkerWindow(void)
 
 }
 
+void MyWindow::UpdateClient(LPSOCKET_INFORMATION SocketInfo, DWORD RecvBytes)
+{
+	printf("WSARecv() is OK!\n");
+
+	SocketInfo->DataBuf.buf[RecvBytes] = 0;
+	OutputDebugStringA(SocketInfo->DataBuf.buf);
+
+	SocketInfo->BytesRECV = RecvBytes;
+	LPSOCKET_INFORMATION firstClient = SocketInfoList;
+
+	if (RecvBytes > 0)
+	{
+		//printf(" %.*s \n", RecvBytes, SocketInfo->DataBuf.buf);
+		std::string dataClient = SocketInfo->DataBuf.buf;
+		//printf("%s\n", dataClient);
+
+		int posX = std::stoi(dataClient.substr(0, 1));
+		int posY = std::stoi(dataClient.substr(2, 1));
+		//printf("%d\n", posX);
+		if (Mserve.handleEvent(posX, posY) == true && SocketNumber == 1)
+		{
+
+			for (LPSOCKET_INFORMATION currentClient = SocketInfoList; currentClient != NULL; currentClient = currentClient->Next)
+			{
+
+				if (SocketInfo->color == 2)
+				{
+					dataClient += " 2";
+					int iResult = send(currentClient->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					//printf("Send %d bytes to client: %.*s\n", iResult, recvbuf);
+					if (iResult == SOCKET_ERROR) {
+						printf("send failed: %d\n", WSAGetLastError());
+					}
+					else
+						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
+					SocketInfo->BytesRECV = 0;
+				}
+				else if (SocketInfo->color == 1)
+				{
+					dataClient += " 1";
+					int iResult = send(currentClient->Socket, dataClient.c_str(), (int)strlen(dataClient.c_str()), 0);
+					if (iResult == SOCKET_ERROR) {
+						printf("send failed: %d\n", WSAGetLastError());
+					}
+					else
+						printf("Sent %d bytes to server: %s\n", iResult, dataClient);
+					SocketInfo->BytesRECV = 0;
+				}
+			}
+
+		}
+		else
+		{
+			const char* erreur = "rejouer";
+			int iResult = send(SocketInfo->Socket, erreur, (int)strlen(erreur), 0);
+			printf("erreur au moment d'un clic client \n");
+
+		}
+	}
+	return;
+}
+
 int MyWindow::LaunchServ() {
 	DWORD Ret;
 	SOCKET Listen;
@@ -290,7 +337,6 @@ int MyWindow::LaunchServ() {
 	HWND Window;
 	WSADATA wsaData;
 	MorpionServer Mserve;
-	std::cout << "LaunchServ" << std::endl;
 
 	if ((Window = MyWindow::MakeWorkerWindow()) == NULL)
 	{
@@ -318,7 +364,7 @@ int MyWindow::LaunchServ() {
 		printf("socket() is pretty fine!\n");
 
 	if (WSAAsyncSelect(Listen, Window, WM_SOCKET, FD_ACCEPT | FD_CLOSE) == 0)
-		printf("WSAAsyncSelect() is OK lol!\n");
+		printf("WSAAsyncSelect() is OK \n");
 	else
 		printf("WSAAsyncSelect() failed with error code %d\n", WSAGetLastError());
 

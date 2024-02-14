@@ -21,7 +21,6 @@ Threading windowServe;
 
 int main()
 {
-	std::cout << "iii" << std::endl;
 	int playerMove = NULL;
 	windowServe.LaunchThread();
 	//boucle morpion

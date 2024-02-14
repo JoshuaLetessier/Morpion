@@ -4,35 +4,60 @@
 #include "Morpion.hpp"
 #include "client.cpp"
 
+#define WM_SOCKET (WM_USER + 1)
+
 const int gridSize = 3;
 const int cellSize = 100;
 
-//inline int client(char* callback);
-//inline int killClient();
+inline int client();
+inline int killClient();
 
-Morpion::Morpion() : currentPlayer(Player::CircleRed) {
+
+Morpion::Morpion()
+{
     // Initialiser la grille avec des valeurs par défaut
-    board = std::vector<std::vector<Player>>(gridSize, std::vector<Player>(gridSize, Player::None));
+    board = std::vector<std::vector<int>>(gridSize, std::vector<int>(gridSize, 0));
+    currentPlayer = 1;
+    myPlayerVal = 1;
+
 }
 
 bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
+    if (myPlayerVal != currentPlayer)
+    {
+        return false;
+    }
+
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
 
         if (mouseX >= 0 && mouseX < gridSize && mouseY >= 0 && mouseY < gridSize &&
-            board[mouseY][mouseX] == Player::None) {
+            board[mouseY][mouseX] == 0) {
             board[mouseY][mouseX] = currentPlayer;
         }
 
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
         const char* data = dataConvert.c_str();
-        OutputDebugStringA("event detecte \n");
+        printf("event detecte \n");
         sendData(data);
 
         return true;
     }
     return false;
+}
+
+void Morpion::swapPlayer()
+{
+    if (currentPlayer == 1)
+        currentPlayer = 2;
+    else
+        currentPlayer = 1;
+}
+
+void Morpion::setTileVal(int targetX, int targetY, int value)
+{
+    board[targetY][targetX] = value;
 }
 
 void Morpion::draw(sf::RenderWindow& window) {
@@ -47,11 +72,14 @@ void Morpion::draw(sf::RenderWindow& window) {
             cell.setOutlineColor(sf::Color::Black);
             window.draw(cell);
 
-            // Dessiner X ou O
-            if (board[i][j] == Player::CircleRed) {
+            // Le joueur ROUGE place un pion
+            if (board[i][j] == 1)
+            {
                 drawCircleR(window, j * cellSize, i * cellSize);
             }
-            else if (board[i][j] == Player::CircleBalck) {
+            // Le joueur NOIR place un pion
+            else if (board[i][j] == 2)
+            {
                 drawCircle(window, j * cellSize, i * cellSize);
             }
         }
@@ -129,23 +157,29 @@ std::string getPlayerName() {
 
 int main() {
 
-    client;
-    sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
-
     Morpion game;
 
+    sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
+
+    client();
     while (window.isOpen()) {
+
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
                 killClient();
             }
-
             if (game.handleEvent(event, window))
-                recvData();
-        }
+            {
+                char* data = recvData();
+                int newPosX = (int)data[0] - 48;
+                int newPosY = (int)data[2] - 48;
+                printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);
 
+                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+            }
+        }
         game.draw(window);
 
     }
