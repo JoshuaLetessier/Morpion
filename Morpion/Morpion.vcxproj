@@ -139,12 +139,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="ClientThreading.cpp" />
     <ClCompile Include="Morpion.cpp" />
-    <ClCompile Include="Threading.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="client.hpp" />
+    <ClInclude Include="ClientThreading.hpp" />
     <ClInclude Include="Morpion.hpp" />
-    <ClInclude Include="Threading.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

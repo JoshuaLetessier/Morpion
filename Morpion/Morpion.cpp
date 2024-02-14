@@ -1,16 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+#include "ClientThreading.hpp"
 #include "Morpion.hpp"
 
 #define WM_SOCKET (WM_USER + 1)
-
-const int gridSize = 3;
-const int cellSize = 100;
-
-inline int client();
-inline int killClient();
-
 
 Morpion::Morpion()
 {

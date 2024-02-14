@@ -1,14 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#include <windows.h>
-#include <strsafe.h>
-#include <iostream>
-#include <stdio.h>
-
-#define BUF_SIZE 255
-
-#include "Threading.hpp"
+#include "ClientThreading.hpp"
 
 Threading::Threading()
 {}

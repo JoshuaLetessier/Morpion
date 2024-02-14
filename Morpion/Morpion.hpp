@@ -1,5 +1,5 @@
 #pragma once 
-#include "Threading.hpp"
+
 
 class Morpion {
 public:
@@ -18,5 +18,9 @@ public:
 	void drawCircleR(sf::RenderWindow& window, float x, float y);
 	void drawCircle(sf::RenderWindow& window, float x, float y);
 
+private:
+
 };
+const int gridSize = 3;
+const int cellSize = 100;
 Threading clientServe;
