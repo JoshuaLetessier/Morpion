@@ -31,9 +31,15 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
         }
 
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
-        const char* data = dataConvert.c_str();
+        importFromMorpion = dataConvert.c_str();
+        //const char* data = dataConvert.c_str();
         printf("event detecte \n");
-        sendData(data);
+        //sendData(data);
+        if (importFromMorpion != NULL)
+        {
+            toggle();
+            std::cout << "state is : " << state << std::endl;
+        }
 
         return true;
     }
@@ -149,8 +155,8 @@ std::string getPlayerName() {
 }
 
 int main() {
-
     Morpion game;
+    Threading clientServe;
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
@@ -166,12 +172,12 @@ int main() {
             }
             if (game.handleEvent(event, window))
             {
-                char* data = recvData();
+                /*char* data = recvData();
                 int newPosX = (int)data[0] - 48;
                 int newPosY = (int)data[2] - 48;
                 printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);
 
-                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+                game.setTileVal(newPosX, newPosY, game.currentPlayer);*/
             }
         }
         game.draw(window);

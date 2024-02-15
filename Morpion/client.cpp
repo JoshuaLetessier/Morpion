@@ -80,8 +80,27 @@ static int client()
     }
     printf("Connection au serveur OK !\n");
     recvData();
+    
+    while (!end)
+    {
+        switch (state)
+        {
+        case NotRecv:
+            break;
+        case IsSend:
+            sendData(importFromMorpion);
+            toggle();
+            break;
+        case IsRecv:
+            recvData();
+            toggle();
+            break;
+        default:
+            break;
+        }
+    }
 
-    return 0;
+    //return 0;
 }
 
 static int killClient()

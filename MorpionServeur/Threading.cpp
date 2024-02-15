@@ -99,8 +99,7 @@ void Threading::LaunchThread()
     //Array_Of_Thread_Handles[1] = Handle_Of_Thread_2;
 
     // Wait until all threads have terminated.
-    //WaitForMultipleObjects(1, Array_Of_Thread_Handles, TRUE, INFINITE);
-    WaitForSingleObject(Array_Of_Thread_Handles[0], INFINITE);
+    WaitForMultipleObjects(2, Array_Of_Thread_Handles, TRUE, INFINITE);
 
     // Close all thread handles upon completion.
     CloseHandle(Handle_Of_Thread_ws);

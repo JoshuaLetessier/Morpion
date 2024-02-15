@@ -24,7 +24,7 @@ int main()
 	int playerMove = NULL;
 	windowServe.LaunchThread();
 	//boucle morpion
-	while (!morpion.checkGameOver())
+	while (true)
 	{
 		if (playerMove)
 		{

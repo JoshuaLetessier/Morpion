@@ -9,9 +9,8 @@ Threading::Threading()
 //-------------------------------------------
 // A function that represents Thread number 1
 //-------------------------------------------
-DWORD WINAPI Threading::Thread_ws(LPVOID lpParam)
+DWORD WINAPI Threading::Thread_cs(LPVOID lpParam)
 {
-    MSG msg;
     client();
 
     return 0;
@@ -27,7 +26,7 @@ void Threading::LaunchThread()
     HANDLE Array_Of_Thread_Handles[1];
 
     // Create thread 1.
-    Handle_Of_Thread_ws = CreateThread(NULL, 0, Thread_ws, &Data_Of_Thread_ws, 0, NULL);
+    Handle_Of_Thread_ws = CreateThread(NULL, 0, Thread_cs, &Data_Of_Thread_ws, 0, NULL);
     if (Handle_Of_Thread_ws == NULL)
         ExitProcess(Data_Of_Thread_ws);
 
@@ -35,7 +34,7 @@ void Threading::LaunchThread()
     Array_Of_Thread_Handles[0] = Handle_Of_Thread_ws;
 
     // Wait until all threads have terminated.
-    WaitForSingleObject(Array_Of_Thread_Handles[0], INFINITE);
+    WaitForMultipleObjects(2, Array_Of_Thread_Handles, TRUE, INFINITE);
 
     // Close all thread handles upon completion.
     CloseHandle(Handle_Of_Thread_ws);
