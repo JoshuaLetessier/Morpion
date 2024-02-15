@@ -5,6 +5,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "client.hpp"
 
@@ -17,7 +19,9 @@
 static int iResult = 0;
 static SOCKET ConnectSocket = INVALID_SOCKET;
 
-static int client()
+static int killClient();
+
+inline int client()
 {
     WSADATA wsaData;
 
@@ -79,26 +83,26 @@ static int client()
         return 1;
     }
     printf("Connection au serveur OK !\n");
-    recvData();
 
-    return 0;
+    
+    //return 0;
 }
 
 static int killClient()
 {
     if (iResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return 1;
     }
 
     closesocket(ConnectSocket);
     WSACleanup();
+    return 1;
 }
+
 
 static int sendData(const char data[4096])
 {
+    printf("premier thread\n");
     iResult = send(ConnectSocket, data, (int)strlen(data), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
@@ -106,9 +110,13 @@ static int sendData(const char data[4096])
         WSACleanup();
         return 1;
     }
+    else
+    {
+        printf("envoie résussi \n");
+    }
 }
 
-static char* recvData() {
+inline char* recvData() {
     if (ConnectSocket == INVALID_SOCKET)
     {
         printf("Socket invalid !!!\n");
@@ -127,4 +135,5 @@ static char* recvData() {
         printf("recv failed with error: %ld\n", WSAGetLastError());
     }
     return recvbuf;
+    
 }

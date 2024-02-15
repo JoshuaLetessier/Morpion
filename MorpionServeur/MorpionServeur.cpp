@@ -32,15 +32,12 @@ MorpionServer::MorpionServer()
 
 bool MorpionServer::handleEvent(int playerX, int playerY)
 {
-    printf("handle cote serveur\n");
-
-
     printf("valeur de la case avant le clique %d %d %d\n", board[playerX][playerY], playerX, playerY);
 
     if (board[playerX][playerY] == 0 && playerX >= 0 && playerX < gridSize && playerY >= 0 && playerY < gridSize)
     {
         board[playerX][playerY] = 1;
-        printf("%d \n", board[playerX][playerY]);
+        printf("value X et Y %d \n", board[playerX][playerY]);
         //switchPlayer();
         return true;
     }

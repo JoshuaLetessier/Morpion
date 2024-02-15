@@ -20,7 +20,6 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
     {
         return false;
     }
-
     if (event.type == sf::Event::MouseButtonPressed) {
         int mouseX = event.mouseButton.x / cellSize;
         int mouseY = event.mouseButton.y / cellSize;
@@ -29,12 +28,16 @@ bool Morpion::handleEvent(sf::Event& event, sf::RenderWindow& window) {
             board[mouseY][mouseX] == 0) {
             board[mouseY][mouseX] = currentPlayer;
         }
-
+       
         std::string dataConvert = std::to_string(mouseX) + " " + std::to_string(mouseY);
-        const char* data = dataConvert.c_str();
-        printf("event detecte \n");
-        sendData(data);
-
+        importFromMorpion = dataConvert.c_str();
+        //clientServe.LaunchThread(0);
+       
+        /*printf("X %d Y %d\n", mouseX, mouseY);
+        printf("dataConvert %s\n", dataConvert);
+        printf("importFromMorpion: %c \n", importFromMorpion);*/
+       // printf("event detecte \n");
+        
         return true;
     }
     return false;
@@ -154,8 +157,8 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Morpion Joueur contre Joueur");
 
-    clientServe.LaunchThread();
-
+    client();
+    clientServe.LaunchThread(1);
     while (window.isOpen()) {
 
         sf::Event event;
@@ -166,12 +169,14 @@ int main() {
             }
             if (game.handleEvent(event, window))
             {
-                char* data = recvData();
+
+               
+                /*char* data = recvData();
                 int newPosX = (int)data[0] - 48;
                 int newPosY = (int)data[2] - 48;
-                printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);
+                printf("data printed from morpion.cpp: %d, %d", newPosX, newPosY);*/
 
-                game.setTileVal(newPosX, newPosY, game.currentPlayer);
+                /*game.setTileVal(newPosX, newPosY, game.currentPlayer);*/
             }
         }
         game.draw(window);
